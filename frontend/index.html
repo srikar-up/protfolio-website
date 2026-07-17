@@ -1,19 +1,53 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth light">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="A premium Neumorphic portfolio website featuring modern components, soft UI aesthetics, interactive cards, and a node backend." />
+    <meta name="description" content="Aura — Premium Bento Design Portfolio & Lab. Fusing physical depth with tactile layouts, featuring coordinate grids, interactive audio, custom visualizer and process logs." />
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Inter for readability, Syne for editorial display -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
     
-    <title>Aura - Premium Neumorphic Portfolio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              syne: ['Syne', 'sans-serif'],
+            },
+            colors: {
+              brand: {
+                orange: '#FF4500',  // Solar Orange
+                green: '#10B981',   // Emerald Green
+                lightBg: '#F5F5F7', // Off-white premium canvas
+                darkBg: '#09090B',  // Absolute deep black canvas
+                lightCard: '#FFFFFF',
+                darkCard: '#121215',
+              }
+            },
+            boxShadow: {
+              'soft': '0 20px 50px -10px rgba(0, 0, 0, 0.02), 0 10px 20px -15px rgba(0, 0, 0, 0.03)',
+              'soft-dark': '0 30px 100px -10px rgba(0, 0, 0, 0.5), 0 10px 30px -15px rgba(0, 0, 0, 0.4)',
+              'book': '8px 12px 20px rgba(0, 0, 0, 0.12), -1px 0 4px rgba(0, 0, 0, 0.03)',
+              'glow-orange': '0 0 40px rgba(255, 69, 0, 0.15)',
+              'glow-green': '0 0 40px rgba(16, 185, 129, 0.15)'
+            }
+          }
+        }
+      }
+    </script>
+    
+    <title>Aura — Premium Bento Design Portfolio & Lab</title>
   </head>
-  <body>
+  <body class="bg-brand-lightBg dark:bg-brand-darkBg text-zinc-800 dark:text-zinc-200 font-sans antialiased transition-colors duration-500 selection:bg-orange-500/10 overflow-x-hidden">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -4,46 +4,17 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer style={styles.footer}>
-      <div className="container" style={styles.container}>
-        <p style={styles.copy}>
-          &copy; {currentYear} Aura Portfolio. Made with ❤️ and Neumorphism.
-        </p>
-        <div style={styles.links}>
-          <a href="#hero" style={styles.link}>Back to Top</a>
+    <footer className="border-t border-zinc-200/10 dark:border-zinc-800/10 bg-white/50 dark:bg-brand-darkBg/50 py-12 px-6 md:px-12 text-zinc-400 dark:text-zinc-500 text-xs font-mono mt-12 w-full">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div>
+          © {currentYear} AURA DESIGN LAB. ALL RIGHTS RESERVED.
+        </div>
+        <div className="flex items-center space-x-6">
+          <a href="https://twitter.com" className="hover:text-zinc-900 dark:hover:text-white bento-transition">TWITTER</a>
+          <a href="https://linkedin.com" className="hover:text-zinc-900 dark:hover:text-white bento-transition">LINKEDIN</a>
+          <a href="https://read.cv" className="hover:text-zinc-900 dark:hover:text-white bento-transition">READ.CV</a>
         </div>
       </div>
     </footer>
   );
 }
-
-const styles = {
-  footer: {
-    padding: '40px 0',
-    background: 'var(--bg-primary)',
-    borderTop: 'var(--border-glow)',
-  },
-  container: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '16px',
-  },
-  copy: {
-    fontSize: '0.9rem',
-    color: 'var(--text-secondary)',
-    fontWeight: 500,
-  },
-  links: {
-    display: 'flex',
-    gap: '24px',
-  },
-  link: {
-    textDecoration: 'none',
-    fontSize: '0.9rem',
-    color: 'var(--text-secondary)',
-    fontWeight: 600,
-    transition: 'color 0.2s ease',
-  }
-};

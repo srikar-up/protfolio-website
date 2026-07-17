@@ -1,113 +1,43 @@
 import React from 'react';
-import { User, Award, CheckCircle, Coffee } from 'lucide-react';
 
 export default function About() {
-  const stats = [
-    { icon: <Award className="gradient-text" />, value: '5+', label: 'Years Experience' },
-    { icon: <CheckCircle className="gradient-text" />, value: '40+', label: 'Projects Completed' },
-    { icon: <Coffee className="gradient-text" />, value: '250k+', label: 'Lines of Code' },
-  ];
-
   return (
-    <section id="about" style={styles.section}>
-      <div className="container">
-        <h2 style={styles.sectionTitle}>
-          <span className="gradient-text">01. </span>About Me
-        </h2>
+    <div className="lg:col-span-4 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 min-h-[420px] flex flex-col justify-between bento-transition explode-level-1">
+      <div>
+        <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-8">My Experience</h2>
         
-        <div className="grid-2" style={styles.grid}>
-          <div className="nm-flat" style={styles.bioCard}>
-            <div style={styles.iconHeader}>
-              <User size={24} style={{ color: 'var(--accent-color)' }} />
-              <h3 style={styles.bioTitle}>My Story</h3>
-            </div>
-            <p style={styles.bioText}>
-              I am a passionate Full-Stack Engineer based in San Francisco, dedicated to crafting software that bridges the gap between powerful performance and human-centric design. Over the last five years, I have worked with startups and enterprises alike to architect, build, and deploy clean web solutions.
-            </p>
-            <p style={styles.bioText}>
-              I believe that design is not just what it looks like and feels like, but how it works. That is why I love combining modern component architectures with custom CSS systems to create delightful UX details.
-            </p>
+        <div className="space-y-6 relative pl-4 border-l border-zinc-100 dark:border-zinc-800/40">
+          {/* Role 1 */}
+          <div className="relative">
+            <span 
+              className="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-zinc-900 dark:bg-white border-2 border-white dark:border-zinc-950 ring-4 ring-zinc-100 dark:ring-zinc-900" 
+              id="timeline-dot"
+            ></span>
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Product Lead at Aura Design</h3>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">2025 - Present / Montreal</p>
           </div>
 
-          <div style={styles.statsContainer}>
-            {stats.map((stat, i) => (
-              <div key={i} className="nm-flat" style={styles.statCard}>
-                <div className="nm-inset-sm" style={styles.statIconContainer}>
-                  {stat.icon}
-                </div>
-                <div>
-                  <h4 style={styles.statValue}>{stat.value}</h4>
-                  <p style={styles.statLabel}>{stat.label}</p>
-                </div>
-              </div>
-            ))}
+          {/* Role 2 */}
+          <div className="relative opacity-60 hover:opacity-100 bento-transition">
+            <span className="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700 border-2 border-white dark:border-zinc-950"></span>
+            <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-300">UX Architect at Apple</h3>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">2024 - Cupertino</p>
+          </div>
+
+          {/* Role 3 */}
+          <div className="relative opacity-40 hover:opacity-100 bento-transition">
+            <span className="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-zinc-200 dark:bg-zinc-800 border-2 border-white dark:border-zinc-950"></span>
+            <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-400">Systems Designer at Stripe</h3>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">2022 - Remote</p>
           </div>
         </div>
       </div>
-    </section>
+
+      <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800/40 mt-6">
+        <p className="text-xs text-zinc-400 dark:text-zinc-500 leading-normal">
+          Balancing high-performance code pipelines with modern typography grids.
+        </p>
+      </div>
+    </div>
   );
 }
-
-const styles = {
-  section: {
-    padding: '100px 0',
-    background: 'var(--bg-primary)',
-    borderBottom: 'var(--border-glow)',
-  },
-  sectionTitle: {
-    fontSize: '2.25rem',
-    marginBottom: '48px',
-  },
-  grid: {
-    alignItems: 'stretch',
-  },
-  bioCard: {
-    padding: '40px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-  },
-  iconHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  bioTitle: {
-    fontSize: '1.5rem',
-  },
-  bioText: {
-    fontSize: '1.05rem',
-    lineHeight: 1.7,
-    color: 'var(--text-secondary)',
-  },
-  statsContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    gap: '24px',
-  },
-  statCard: {
-    padding: '24px 32px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '24px',
-    flex: 1,
-  },
-  statIconContainer: {
-    width: '56px',
-    height: '56px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: '16px',
-  },
-  statValue: {
-    fontSize: '1.75rem',
-    fontWeight: 800,
-  },
-  statLabel: {
-    fontSize: '0.95rem',
-    color: 'var(--text-secondary)',
-    fontWeight: 500,
-  }
-};
