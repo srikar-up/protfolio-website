@@ -98,7 +98,7 @@
   "books": [
     {
       "id": 1,
-      "title": "Dieter Rams: Complete Works",
+      "title": "laddu eater",
       "author": "By Klaus Klemp",
       "spine": "rams dieter",
       "color": "bg-[#FBE3D3] text-[#B85822] dark:bg-[#4E392B] dark:text-[#FBE3D3]",
@@ -158,7 +158,16 @@
       "subtitle": "Frontend & Backend Systems",
       "bgColor": "from-orange-500 to-amber-600",
       "textGrad": "text-orange-500",
-      "pills": ["React.js", "HTML5", "CSS3", "JavaScript", "Vite", "Node.js", "Express.js", "Tailwind CSS"]
+      "pills": [
+        "React.js",
+        "HTML5",
+        "CSS3",
+        "JavaScript",
+        "Vite",
+        "Node.js",
+        "Express.js",
+        "Tailwind CSS"
+      ]
     },
     {
       "id": 1,
@@ -166,7 +175,14 @@
       "subtitle": "Interface Design & Prototyping",
       "bgColor": "from-blue-500 to-indigo-600",
       "textGrad": "text-indigo-500",
-      "pills": ["Figma", "Wireframing", "Prototyping", "Design Systems", "User Research", "Information Architecture"]
+      "pills": [
+        "Figma",
+        "Wireframing",
+        "Prototyping",
+        "Design Systems",
+        "User Research",
+        "Information Architecture"
+      ]
     },
     {
       "id": 2,
@@ -174,7 +190,15 @@
       "subtitle": "Programming & Automation",
       "bgColor": "from-emerald-500 to-teal-600",
       "textGrad": "text-emerald-500",
-      "pills": ["Python", "Django", "Flask", "FastAPI", "APIs", "BeautifulSoup", "Automation Scripts"]
+      "pills": [
+        "Python",
+        "Django",
+        "Flask",
+        "FastAPI",
+        "APIs",
+        "BeautifulSoup",
+        "Automation Scripts"
+      ]
     },
     {
       "id": 3,
@@ -182,7 +206,15 @@
       "subtitle": "Data Wrangling & ML Models",
       "bgColor": "from-violet-500 to-purple-600",
       "textGrad": "text-violet-500",
-      "pills": ["Pandas", "NumPy", "Scikit-Learn", "TensorFlow", "Matplotlib", "SQL", "Data Visualization"]
+      "pills": [
+        "Pandas",
+        "NumPy",
+        "Scikit-Learn",
+        "TensorFlow",
+        "Matplotlib",
+        "SQL",
+        "Data Visualization"
+      ]
     }
   ],
   "hero": {

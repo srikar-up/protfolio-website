@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 
 export default function Dashboard({ data, onSave, onClose }) {
   const { showToast } = useTheme();
-  const [activeTab, setActiveTab] = useState('projects');
+  const [activeTab, setActiveTab] = useState('hero');
   
   // Clone data to local state to support editing before saving
   const [localData, setLocalData] = useState(JSON.parse(JSON.stringify(data)));
   const [selectedItemIndex, setSelectedItemIndex] = useState(0);
 
+  // Synchronize localData with incoming data changes (e.g. from backend fetch)
+  useEffect(() => {
+    if (data) {
+      setLocalData(JSON.parse(JSON.stringify(data)));
+    }
+  }, [data]);
+
   const tabs = [
+    { id: 'hero', label: 'Hero Section' },
     { id: 'projects', label: 'Projects' },
     { id: 'blogs', label: 'Blogs' },
     { id: 'timeline', label: 'Timeline' },
@@ -41,19 +49,37 @@ export default function Dashboard({ data, onSave, onClose }) {
     }
   };
 
-  // Generic Field Update
+  // Generic Field Update using deep copy to prevent React state mutation issues
   const updateField = (section, index, field, value) => {
     setLocalData(prev => {
-      const updated = { ...prev };
+      const updated = JSON.parse(JSON.stringify(prev));
       if (section === 'timeline' && index !== null) {
         // Timeline milestones are nested under timeline.items
-        updated.timeline.items[index][field] = value;
+        if (updated.timeline && updated.timeline.items && updated.timeline.items[index]) {
+          updated.timeline.items[index][field] = value;
+        }
       } else if (index === null) {
-        // Single object like timeline footerText
-        updated[section][field] = value;
+        // Single object like timeline footerText or hero
+        if (updated[section]) {
+          updated[section][field] = value;
+        }
       } else {
-        updated[section][index][field] = value;
+        if (updated[section] && updated[section][index]) {
+          updated[section][index][field] = value;
+        }
       }
+      return updated;
+    });
+  };
+
+  // Helper to update fields in the Hero object
+  const updateHeroField = (field, value) => {
+    setLocalData(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (!updated.hero) {
+        updated.hero = {};
+      }
+      updated.hero[field] = value;
       return updated;
     });
   };
@@ -61,24 +87,28 @@ export default function Dashboard({ data, onSave, onClose }) {
   // Specific nested field helpers
   const updateBookHighlight = (bookIndex, highlightIndex, key, value) => {
     setLocalData(prev => {
-      const updated = { ...prev };
-      updated.books[bookIndex].highlights[highlightIndex][key] = value;
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (updated.books && updated.books[bookIndex] && updated.books[bookIndex].highlights && updated.books[bookIndex].highlights[highlightIndex]) {
+        updated.books[bookIndex].highlights[highlightIndex][key] = value;
+      }
       return updated;
     });
   };
 
   const updateSkillsPills = (skillIndex, pillsString) => {
     setLocalData(prev => {
-      const updated = { ...prev };
-      updated.skills[skillIndex].pills = pillsString.split(',').map(s => s.trim()).filter(Boolean);
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (updated.skills && updated.skills[skillIndex]) {
+        updated.skills[skillIndex].pills = pillsString.split(',').map(s => s.trim()).filter(Boolean);
+      }
       return updated;
     });
   };
 
-  // Add Item Helper
+  // Add Item Helper using deep copy
   const handleAddItem = () => {
     setLocalData(prev => {
-      const updated = { ...prev };
+      const updated = JSON.parse(JSON.stringify(prev));
       let newItem = {};
       
       if (activeTab === 'projects') {
@@ -146,10 +176,10 @@ export default function Dashboard({ data, onSave, onClose }) {
     });
   };
 
-  // Delete Item Helper
+  // Delete Item Helper using deep copy
   const handleDeleteItem = (index) => {
     setLocalData(prev => {
-      const updated = { ...prev };
+      const updated = JSON.parse(JSON.stringify(prev));
       
       if (activeTab === 'projects') {
         updated.projects.splice(index, 1);
@@ -231,16 +261,26 @@ export default function Dashboard({ data, onSave, onClose }) {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Record List</h3>
-              <button 
-                onClick={handleAddItem}
-                className="text-[10px] font-mono text-brand-orange font-bold hover:underline"
-              >
-                + ADD NEW
-              </button>
+              {activeTab !== 'hero' && (
+                <button 
+                  onClick={handleAddItem}
+                  className="text-[10px] font-mono text-brand-orange font-bold hover:underline"
+                >
+                  + ADD NEW
+                </button>
+              )}
             </div>
             
             <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
-              {activeList.map((item, index) => (
+              {activeTab === 'hero' ? (
+                <div className="p-4 rounded-xl border border-brand-orange/45 bg-brand-orange/5 text-left">
+                  <h4 className="text-xs font-bold text-zinc-850 dark:text-zinc-200">Hero Section</h4>
+                  <p className="text-[10px] font-mono text-zinc-400 mt-1 leading-relaxed">
+                    Updates the primary greeting, titles, bio, and business card details shown on the homepage.
+                  </p>
+                </div>
+              ) : (
+                activeList.map((item, index) => (
                 <div
                   key={item.id || index}
                   onClick={() => setSelectedItemIndex(index)}
@@ -268,8 +308,9 @@ export default function Dashboard({ data, onSave, onClose }) {
                     {item.year || item.date || item.subtitle || item.author || "Global Values"}
                   </p>
                 </div>
-              ))}
-              {activeList.length === 0 && (
+              ))
+              )}
+              {activeTab !== 'hero' && activeList.length === 0 && (
                 <p className="text-xs font-mono text-zinc-400 text-center py-8">No records found. Add one!</p>
               )}
             </div>
@@ -289,10 +330,103 @@ export default function Dashboard({ data, onSave, onClose }) {
         </div>
 
         {/* Right Card: Editor Form Panel */}
-        <div className="lg:col-span-8 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 bento-transition">
+        <div className="lg:col-span-8 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 bento-transition animate-fade-in">
           <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-6">Editor Attributes</h3>
           
-          {currentItem ? (
+          {activeTab === 'hero' ? (
+            <div className="space-y-6 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <h4 className="text-xs font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-2 border-b pb-1 dark:border-zinc-800/40">Bio Greeting & Text</h4>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Full Name</label>
+                  <input 
+                    type="text" 
+                    value={localData.hero?.name || ''} 
+                    onChange={(e) => updateHeroField('name', e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Primary Title</label>
+                  <input 
+                    type="text" 
+                    value={localData.hero?.title || ''} 
+                    onChange={(e) => updateHeroField('title', e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Accent Subtitle</label>
+                  <input 
+                    type="text" 
+                    value={localData.hero?.subtitle || ''} 
+                    onChange={(e) => updateHeroField('subtitle', e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Bio Paragraph</label>
+                  <textarea 
+                    rows="3"
+                    value={localData.hero?.bio || ''} 
+                    onChange={(e) => updateHeroField('bio', e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition resize-none"
+                  />
+                </div>
+
+                <div className="md:col-span-2 mt-4">
+                  <h4 className="text-xs font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-2 border-b pb-1 dark:border-zinc-800/40">Business Card Metadata</h4>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Card Display Name</label>
+                  <input 
+                    type="text" 
+                    value={localData.hero?.cardName || ''} 
+                    onChange={(e) => updateHeroField('cardName', e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Card Course / Role</label>
+                  <input 
+                    type="text" 
+                    value={localData.hero?.cardCourse || ''} 
+                    onChange={(e) => updateHeroField('cardCourse', e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Card Email</label>
+                  <input 
+                    type="text" 
+                    value={localData.hero?.cardEmail || ''} 
+                    onChange={(e) => updateHeroField('cardEmail', e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Card LinkedIn Username</label>
+                  <input 
+                    type="text" 
+                    value={localData.hero?.cardLinkedin || ''} 
+                    onChange={(e) => updateHeroField('cardLinkedin', e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Card GitHub Username</label>
+                  <input 
+                    type="text" 
+                    value={localData.hero?.cardGithub || ''} 
+                    onChange={(e) => updateHeroField('cardGithub', e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+              </div>
+            </div>
+          ) : currentItem ? (
             <div className="space-y-6 text-left">
               
               {/* Form Grid */}
