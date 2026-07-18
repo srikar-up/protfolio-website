@@ -16,9 +16,6 @@ export const ThemeProvider = ({ children }) => {
     return localStorage.getItem('theme-accent') || 'orange';
   });
 
-  // 3D Explode Mode State
-  const [explodeMode, setExplodeMode] = useState(false);
-
   // Toast Notification State
   const [toast, setToast] = useState({ visible: false, message: '' });
   const [toastTimeout, setToastTimeout] = useState(null);
@@ -53,10 +50,6 @@ export const ThemeProvider = ({ children }) => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
 
-  const toggleExplodeMode = () => {
-    setExplodeMode(prev => !prev);
-  };
-
   const showToast = (message) => {
     if (toastTimeout) {
       clearTimeout(toastTimeout);
@@ -74,8 +67,6 @@ export const ThemeProvider = ({ children }) => {
       toggleTheme, 
       accent, 
       setAccent, 
-      explodeMode, 
-      toggleExplodeMode,
       toast,
       showToast
     }}>

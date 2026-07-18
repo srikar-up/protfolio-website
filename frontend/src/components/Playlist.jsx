@@ -5,7 +5,7 @@ export default function Playlist() {
   const { showToast } = useTheme();
   const [isPlaying, setIsPlaying] = useState(false);
   const [song, setSong] = useState({
-    title: 'Alex Playlist',
+    title: "Srikar's Playlist",
     artist: 'Slower Ambient Pulses'
   });
 
@@ -20,7 +20,7 @@ export default function Playlist() {
     } else {
       showToast("Audio stream paused.");
       setSong({
-        title: 'Alex Playlist',
+        title: "Srikar's Playlist",
         artist: 'Slower Ambient Pulses'
       });
     }

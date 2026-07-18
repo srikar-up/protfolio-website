@@ -117,7 +117,7 @@ export default function Contact() {
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="Hi Alex, I have a project idea..." 
+                placeholder="Hi Srikar, I have a project idea..." 
                 className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-100 outline-none resize-none bento-transition"
                 rows="4"
                 disabled={status === 'sending'}

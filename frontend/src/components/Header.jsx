@@ -1,19 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 
 export default function Header() {
-  const { 
-    theme, 
-    toggleTheme, 
-    accent, 
-    setAccent, 
-    explodeMode, 
-    toggleExplodeMode 
-  } = useTheme();
+  const { theme, toggleTheme, accent, setAccent } = useTheme();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-brand-lightBg/80 dark:bg-brand-darkBg/80 backdrop-blur-md border-b border-zinc-200/10 dark:border-zinc-800/10 py-4 px-6 md:px-12">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
+    <header className={`fixed top-0 left-0 w-full z-50 bento-transition ${
+      isScrolled 
+        ? 'bg-brand-lightBg/80 dark:bg-brand-darkBg/80 backdrop-blur-md border-b border-zinc-200/10 dark:border-zinc-800/10 py-3 shadow-md' 
+        : 'bg-transparent py-6 border-transparent'
+    }`}>
+      <div className="max-w-6xl mx-auto flex justify-between items-center px-6 md:px-12">
         
         {/* Brand Mark and Meta Email */}
         <div className="flex items-center space-x-6">
@@ -28,18 +38,6 @@ export default function Header() {
         {/* Custom Controls Section */}
         <div className="flex items-center space-x-3 md:space-x-4">
           
-          {/* 3D Spec Explode Button */}
-          <button 
-            onClick={toggleExplodeMode} 
-            id="explode-toggle" 
-            className="px-3.5 py-2 rounded-full border border-zinc-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 text-xs font-mono font-semibold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:scale-105 active:scale-95 bento-transition shadow-sm flex items-center space-x-1.5" 
-            title="Inspect Layout 3D Parallax Specification"
-          >
-            <span className={`w-2 h-2 rounded-full animate-pulse inline-block ${explodeMode ? 'bg-brand-orange shadow-glow-orange' : 'bg-zinc-400 dark:bg-zinc-600'}`} id="explode-status-dot"></span>
-            <span className="hidden md:inline">3D SPEC VIEW</span>
-            <span className="md:hidden">3D</span>
-          </button>
-
           {/* Theme Accent Swapper (Orange / Green) */}
           <div className="flex items-center bg-zinc-200/50 dark:bg-zinc-800/50 p-1 rounded-full space-x-1 border border-zinc-200/10">
             <button 

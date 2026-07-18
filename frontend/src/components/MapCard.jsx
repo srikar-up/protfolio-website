@@ -8,8 +8,8 @@ export default function MapCard() {
       
       <div className="absolute inset-0 z-0 opacity-40 pointer-events-none flex items-center justify-center">
         <svg className="w-full h-full text-zinc-300 dark:text-zinc-800" fill="none" stroke="currentColor" strokeWidth="0.5">
-          <line x1="0" y1="50%" x2="100%" y2="50%" strokeDasharray="4"/>
-          <line x1="50%" y1="0" x2="50%" y2="100%" strokeDasharray="4"/>
+          <line x1="0" y1="50%" x2="100%" y2="50%" stroke-dasharray="4"/>
+          <line x1="50%" y1="0" x2="50%" y2="100%" stroke-dasharray="4"/>
           <path d="M10,20 Q60,180 180,240 T400,320" stroke="currentColor" strokeWidth="1.5" stroke-dasharray="2,5"/>
           <path d="M80,20 Q160,200 240,290 T380,450" stroke="currentColor" strokeWidth="1"/>
         </svg>
@@ -31,9 +31,9 @@ export default function MapCard() {
       </div>
 
       <div className="relative z-10 text-center pb-2">
-        <h3 className="font-syne font-bold text-2xl tracking-tight text-zinc-950 dark:text-white uppercase">Montreal</h3>
-        <p className="text-xs font-mono text-zinc-400 dark:text-zinc-500 mt-1">CANADA</p>
-        <p className="text-[9px] font-mono text-zinc-300 dark:text-zinc-600 mt-2 tracking-widest">45.5017° N, 73.5673° W</p>
+        <h3 className="font-syne font-bold text-2xl tracking-tight text-zinc-950 dark:text-white uppercase">Punjab</h3>
+        <p className="text-xs font-mono text-zinc-400 dark:text-zinc-500 mt-1">LPU, INDIA</p>
+        <p className="text-[9px] font-mono text-zinc-300 dark:text-zinc-600 mt-2 tracking-widest">31.2536° N, 75.7037° E</p>
       </div>
     </div>
   );
