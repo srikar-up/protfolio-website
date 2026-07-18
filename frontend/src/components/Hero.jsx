@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 
-export default function Hero() {
+export default function Hero({ data }) {
+  const heroData = data || {
+    name: "Srikar Maddela",
+    title: "Data Science & ML",
+    subtitle: "Developer & Designer.",
+    bio: "Fusing analytical ML pipelines with tactile, interactive layouts. Click my interactive business card on the right to revolve/reveal its setup!",
+    cardName: "Srikar",
+    cardCourse: "B.Tech Data Science with ML",
+    cardEmail: "srikarsensai@gmail.com",
+    cardLinkedin: "srikar-maddela",
+    cardGithub: "srikar-up"
+  };
   const { showToast } = useTheme();
   const [apiStatus, setApiStatus] = useState('connecting');
   const [apiMessage, setApiMessage] = useState('Connecting to Express...');
@@ -69,16 +80,16 @@ export default function Hero() {
           </div>
 
           <h1 className="font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.15] text-zinc-900 dark:text-white mb-6">
-            Hi, I’m Srikar Maddela!
+            Hi, I’m {heroData.name}!
             <br />
             <span className="font-normal text-zinc-400 dark:text-zinc-500">I’m a </span>
-            <span className="font-extrabold text-zinc-800 dark:text-zinc-200">Data Science & ML</span>
+            <span className="font-extrabold text-zinc-800 dark:text-zinc-200">{heroData.title}</span>
             <br />
-            <span id="accent-text" className="text-brand-orange font-extrabold transition-colors duration-500">Developer & Designer.</span>
+            <span id="accent-text" className="text-brand-orange font-extrabold transition-colors duration-500">{heroData.subtitle}</span>
           </h1>
 
           <p className="max-w-xl text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed mb-8">
-            Fusing analytical ML pipelines with tactile, interactive layouts. Click my interactive business card on the right to revolve/reveal its setup!
+            {heroData.bio}
           </p>
 
           <div className="flex flex-row items-center gap-4">
@@ -122,7 +133,7 @@ export default function Hero() {
                 <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-brand-orange/5 dark:bg-brand-orange/10 rounded-full blur-3xl group-hover:bg-brand-orange/15 bento-transition"></div>
                 
                 <div className="flex justify-between items-start z-10">
-                  <span className="text-[10px] font-mono tracking-widest text-brand-orange font-bold uppercase">SRIKAR MADDELA</span>
+                  <span className="text-[10px] font-mono tracking-widest text-brand-orange font-bold uppercase">{(heroData.cardName || heroData.name).toUpperCase()}</span>
                   {/* Decorative card chip */}
                   <div className="w-8 h-6 bg-orange-500/10 border border-orange-500/20 rounded-md relative flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-x-2.5 top-0.5 bottom-0.5 border-r border-orange-500/20"></div>
@@ -131,8 +142,8 @@ export default function Hero() {
                 </div>
                 
                 <div className="z-10 mt-2">
-                  <h3 className="font-sans font-extrabold text-2xl text-zinc-900 dark:text-white tracking-tight leading-none">Srikar Maddela</h3>
-                  <p className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono mt-2 tracking-widest uppercase">Data Science & Machine Learning</p>
+                  <h3 className="font-sans font-extrabold text-2xl text-zinc-900 dark:text-white tracking-tight leading-none">{heroData.name}</h3>
+                  <p className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono mt-2 tracking-widest uppercase">{heroData.cardCourse}</p>
                 </div>
 
                 <div className="flex justify-between items-end z-10 mt-2 pt-3 border-t border-zinc-100 dark:border-zinc-800/40">
@@ -166,26 +177,26 @@ export default function Hero() {
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">2</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"name"</span>: <span className="text-emerald-600 dark:text-emerald-400">"Srikar"</span>,</span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"name"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardName}"</span>,</span>
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">3</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"course"</span>: <span className="text-emerald-600 dark:text-emerald-400">"B.Tech Data Science with ML"</span>,</span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"course"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardCourse}"</span>,</span>
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">4</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"email"</span>: <span className="text-emerald-600 dark:text-emerald-400">"srikarsensai@gmail.com"</span>,</span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"email"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardEmail}"</span>,</span>
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">5</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"linkedin"</span>: <span className="text-emerald-600 dark:text-emerald-400">"srikar-maddela"</span>,</span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"linkedin"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardLinkedin}"</span>,</span>
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">6</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"github"</span>: <span className="text-emerald-600 dark:text-emerald-400">"srikar-up"</span></span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"github"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardGithub}"</span></span>
                   </div>
                   <div className="flex">
-                    <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">7</span>
+                    <span className="text-zinc-400 dark:text-zinc-650 select-none w-5 text-right pr-2">7</span>
                     <span>{"}"}</span>
                   </div>
                 </div>

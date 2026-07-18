@@ -199,7 +199,18 @@ const fallbackData = {
       textGrad: "text-violet-500",
       pills: ["Pandas", "NumPy", "Scikit-Learn", "TensorFlow", "Matplotlib", "SQL", "Data Visualization"]
     }
-  ]
+  ],
+  hero: {
+    name: "Srikar Maddela",
+    title: "Data Science & ML",
+    subtitle: "Developer & Designer.",
+    bio: "Fusing analytical ML pipelines with tactile, interactive layouts. Click my interactive business card on the right to revolve/reveal its setup!",
+    cardName: "Srikar",
+    cardCourse: "B.Tech Data Science with ML",
+    cardEmail: "srikarsensai@gmail.com",
+    cardLinkedin: "srikar-maddela",
+    cardGithub: "srikar-up"
+  }
 };
 
 function MainApp() {
@@ -255,7 +266,7 @@ function MainApp() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
             {/* Hero Block (Transparent, occupies full screen width/height) */}
-            <Hero />
+            <Hero data={portfolioData.hero} />
 
             {/* Projects Showcase (with scroll scatter-assemble effect) */}
             <Projects items={portfolioData.projects} />
