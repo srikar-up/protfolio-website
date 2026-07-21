@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 
-export default function Footer({ onToggleDashboard }) {
+export default function Footer({ onToggleDashboard, navigateTo }) {
   const { showToast } = useTheme();
   const currentYear = new Date().getFullYear();
   const [clickCount, setClickCount] = React.useState(0);
@@ -55,10 +55,65 @@ export default function Footer({ onToggleDashboard }) {
           <div className="space-y-3">
             <h4 className="text-[10px] uppercase font-bold tracking-widest text-zinc-900 dark:text-white">Navigation</h4>
             <ul className="space-y-2 text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
-              <li><a href="#" className="hover:text-brand-orange bento-transition">Home</a></li>
+              <li>
+                <button 
+                  onClick={() => {
+                    if (navigateTo) navigateTo('/');
+                    else {
+                      window.history.pushState({}, '', '/');
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }
+                  }} 
+                  className="hover:text-brand-orange text-left bento-transition"
+                >
+                  Home
+                </button>
+              </li>
               <li><a href="#projects" className="hover:text-brand-orange bento-transition">Projects</a></li>
               <li><a href="#skills-card" className="hover:text-brand-orange bento-transition">Skills</a></li>
               <li><a href="#contact" className="hover:text-brand-orange bento-transition">Contact</a></li>
+              <li>
+                <button 
+                  onClick={() => {
+                    if (navigateTo) navigateTo('/cv');
+                    else {
+                      window.history.pushState({}, '', '/cv');
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }
+                  }} 
+                  className="hover:text-brand-orange text-left bento-transition"
+                >
+                  Web CV
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => {
+                    if (navigateTo) navigateTo('/gallery');
+                    else {
+                      window.history.pushState({}, '', '/gallery');
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }
+                  }} 
+                  className="hover:text-brand-orange text-left bento-transition"
+                >
+                  Creative Gallery
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => {
+                    if (navigateTo) navigateTo('/blogs');
+                    else {
+                      window.history.pushState({}, '', '/blogs');
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }
+                  }} 
+                  className="hover:text-brand-orange text-left bento-transition"
+                >
+                  Blogs Hub
+                </button>
+              </li>
             </ul>
           </div>
 

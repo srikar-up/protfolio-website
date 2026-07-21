@@ -109,7 +109,7 @@ const originalMockups = {
   }
 };
 
-export default function Projects({ items = [] }) {
+export default function Projects({ items = [], onToggleCv }) {
   const { showToast } = useTheme();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [startIndex, setStartIndex] = useState(0);
@@ -302,10 +302,26 @@ export default function Projects({ items = [] }) {
               className="bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 flex flex-col justify-between min-h-[280px] group hover:-translate-y-1.5 cursor-pointer will-change-transform"
             >
               <div className="space-y-4">
-                <div className="flex items-center space-x-3 text-xs font-mono text-zinc-400">
-                  <span>{project.year}</span>
-                  <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
-                  <span>{project.tag}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3 text-xs font-mono text-zinc-400">
+                    <span>{project.year}</span>
+                    <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+                    <span>{project.tag}</span>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onToggleCv) onToggleCv(project.id);
+                    }}
+                    className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-full border bento-transition flex items-center space-x-1 ${
+                      project.showInCv !== false
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200'
+                    }`}
+                    title={project.showInCv !== false ? "Included in CV (Click to toggle)" : "Excluded from CV (Click to toggle)"}
+                  >
+                    <span>{project.showInCv !== false ? '✓ IN CV' : '+ ADD TO CV'}</span>
+                  </button>
                 </div>
                 <h3 className="font-syne font-bold text-2xl text-zinc-900 dark:text-white group-hover:text-brand-orange bento-transition leading-snug">
                   {project.title}
@@ -316,7 +332,22 @@ export default function Projects({ items = [] }) {
               </div>
               <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800/40 flex justify-between items-center mt-6">
                 <span className="text-xs font-mono font-semibold text-zinc-900 dark:text-white uppercase group-hover:translate-x-1 bento-transition">Open Sandbox →</span>
-                <span className="text-[10px] font-mono text-zinc-400">LAUNCH CODE</span>
+                <div className="flex items-center space-x-2">
+                  {project.videoUrl && (
+                    <a
+                      href={project.videoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-500 text-[10px] font-mono font-bold bento-transition"
+                      title="Watch Demo Video"
+                    >
+                      <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                      <span>VIDEO</span>
+                    </a>
+                  )}
+                  <span className="text-[10px] font-mono text-zinc-400">LAUNCH CODE</span>
+                </div>
               </div>
             </div>
           );
@@ -339,6 +370,19 @@ export default function Projects({ items = [] }) {
                 <span className="bg-orange-500/10 text-[10px] font-mono font-semibold px-4 py-1.5 rounded-full text-brand-orange tracking-widest border border-brand-orange/10">
                   {selectedProject.year}
                 </span>
+                <button
+                  onClick={() => {
+                    if (onToggleCv) onToggleCv(selectedProject.id);
+                    setSelectedProject(prev => prev ? { ...prev, showInCv: prev.showInCv === false ? true : false } : null);
+                  }}
+                  className={`text-[10px] font-mono font-bold px-3 py-1 rounded-full border bento-transition flex items-center space-x-1 ${
+                    selectedProject.showInCv !== false
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700'
+                  }`}
+                >
+                  <span>{selectedProject.showInCv !== false ? '✓ IN CV' : '+ ADD TO CV'}</span>
+                </button>
               </div>
               
               <button 
@@ -399,12 +443,25 @@ export default function Projects({ items = [] }) {
 
             {/* Action Bar (Launch Sandbox left, Close View link right) */}
             <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800/40 flex items-center justify-between">
-              <button 
-                onClick={() => handleLaunchProject(selectedProject.title)}
-                className="px-8 py-4 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-brand-orange dark:hover:bg-brand-orange dark:hover:text-white rounded-full font-semibold text-xs shadow-md hover:scale-105 active:scale-95 bento-transition uppercase tracking-wider"
-              >
-                Launch Sandbox
-              </button>
+              <div className="flex items-center space-x-3">
+                <button 
+                  onClick={() => handleLaunchProject(selectedProject.title)}
+                  className="px-6 py-3.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-brand-orange dark:hover:bg-brand-orange dark:hover:text-white rounded-full font-semibold text-xs shadow-md hover:scale-105 active:scale-95 bento-transition uppercase tracking-wider"
+                >
+                  Launch Sandbox
+                </button>
+                {selectedProject.videoUrl && (
+                  <a 
+                    href={selectedProject.videoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-6 py-3.5 bg-red-500 text-white hover:bg-red-600 rounded-full font-semibold text-xs shadow-md hover:scale-105 active:scale-95 bento-transition uppercase tracking-wider flex items-center space-x-2"
+                  >
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <span>Watch Video</span>
+                  </a>
+                )}
+              </div>
               <button 
                 onClick={closeProjectModal}
                 className="text-xs font-mono text-zinc-400 hover:text-zinc-900 dark:hover:text-white bento-transition underline"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 
-export default function Hero({ data }) {
+export default function Hero({ data, navigateTo }) {
   const heroData = data || {
     name: "Srikar Maddela",
     title: "Data Science & ML",
@@ -36,8 +36,13 @@ export default function Hero({ data }) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const handleDownloadCV = () => {
-    showToast("Downloading Srikar's CV...");
-    window.open('/cv.pdf', '_blank');
+    showToast("Opening Srikar's Web CV...");
+    if (navigateTo) {
+      navigateTo('/cv');
+    } else {
+      window.history.pushState({}, '', '/cv');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
   };
 
   const scrollToProjects = () => {
@@ -55,9 +60,7 @@ export default function Hero({ data }) {
   return (
     <section className="lg:col-span-12 w-full flex flex-col items-center justify-between min-h-[92vh] py-8 lg:py-12 relative overflow-hidden select-none">
       
-      {/* Ambient background glows */}
-      <div className="absolute right-0 top-0 w-[40rem] h-[40rem] bg-gradient-to-br from-brand-orange/5 to-transparent rounded-full blur-3xl pointer-events-none" id="hero-gradient-right"></div>
-      <div className="absolute left-0 bottom-0 w-[40rem] h-[40rem] bg-gradient-to-br from-brand-orange/5 to-transparent rounded-full blur-3xl pointer-events-none" id="hero-gradient-left"></div>
+
       
       {/* Main Narrative & Card split container */}
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10 my-auto pt-6">
@@ -100,7 +103,7 @@ export default function Hero({ data }) {
             {/* Clickable Profile Avatar Button */}
             <div 
               onClick={handleCardFlip}
-              className="w-12 h-12 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-800 shadow-md cursor-pointer transform hover:scale-105 active:scale-95 bento-transition flex-shrink-0 group relative"
+              className="w-12 h-12 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-800 shadow-md cursor-pointer transform hover:scale-105 active:scale-95 bento-transition flex-shrink-0 group relative z-10"
               title="Click to revolve card"
             >
               <img 
@@ -129,9 +132,7 @@ export default function Hero({ data }) {
             >
               {/* Front side (Graphical Business Card) */}
               <div className="flip-card-front bg-white dark:bg-brand-darkCard p-6 flex flex-col justify-between overflow-hidden text-zinc-800 dark:text-zinc-200 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20">
-                {/* Background glow visual */}
-                <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-brand-orange/5 dark:bg-brand-orange/10 rounded-full blur-3xl group-hover:bg-brand-orange/15 bento-transition"></div>
-                
+
                 <div className="flex justify-between items-start z-10">
                   <span className="text-[10px] font-mono tracking-widest text-brand-orange font-bold uppercase">{(heroData.cardName || heroData.name).toUpperCase()}</span>
                   {/* Decorative card chip */}

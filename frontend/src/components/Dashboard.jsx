@@ -22,7 +22,8 @@ export default function Dashboard({ data, onSave, onClose }) {
     { id: 'blogs', label: 'Blogs' },
     { id: 'timeline', label: 'Timeline' },
     { id: 'books', label: 'Books' },
-    { id: 'skills', label: 'Skills' }
+    { id: 'skills', label: 'Skills' },
+    { id: 'gallery', label: 'Gallery' }
   ];
 
   const handleTabChange = (tabId) => {
@@ -141,8 +142,14 @@ export default function Dashboard({ data, onSave, onClose }) {
           title: 'New Milestone Item',
           date: 'July 2026 - Present / Company'
         };
-        updated.timeline.items.push(newItem);
-        setSelectedItemIndex(updated.timeline.items.length - 1);
+        if (!updated.timeline) {
+          updated.timeline = { items: [], footerText: '' };
+        }
+        if (!updated.timeline.items) {
+          updated.timeline.items = [];
+        }
+        updated.timeline.items.unshift(newItem);
+        setSelectedItemIndex(0);
       } else if (activeTab === 'books') {
         newItem = {
           id: Date.now(),
@@ -169,6 +176,22 @@ export default function Dashboard({ data, onSave, onClose }) {
         };
         updated.skills.push(newItem);
         setSelectedItemIndex(updated.skills.length - 1);
+      } else if (activeTab === 'gallery') {
+        newItem = {
+          id: Date.now(),
+          category: 'nature',
+          date: 'August 2026',
+          title: 'New Photo',
+          desc: 'Description of photo.',
+          location: 'Location details',
+          camera: 'Camera specs',
+          image: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80&w=800'
+        };
+        if (!updated.gallery) {
+          updated.gallery = [];
+        }
+        updated.gallery.push(newItem);
+        setSelectedItemIndex(updated.gallery.length - 1);
       }
 
       showToast(`Added a new item in ${activeTab}`);
@@ -186,11 +209,17 @@ export default function Dashboard({ data, onSave, onClose }) {
       } else if (activeTab === 'blogs') {
         updated.blogs.splice(index, 1);
       } else if (activeTab === 'timeline') {
-        updated.timeline.items.splice(index, 1);
+        if (updated.timeline && updated.timeline.items) {
+          updated.timeline.items.splice(index, 1);
+        }
       } else if (activeTab === 'books') {
         updated.books.splice(index, 1);
       } else if (activeTab === 'skills') {
         updated.skills.splice(index, 1);
+      } else if (activeTab === 'gallery') {
+        if (updated.gallery) {
+          updated.gallery.splice(index, 1);
+        }
       }
 
       showToast(`Deleted item from ${activeTab}`);
@@ -200,11 +229,12 @@ export default function Dashboard({ data, onSave, onClose }) {
   };
 
   const getActiveList = () => {
-    if (activeTab === 'projects') return localData.projects;
-    if (activeTab === 'blogs') return localData.blogs;
-    if (activeTab === 'timeline') return localData.timeline.items;
-    if (activeTab === 'books') return localData.books;
-    if (activeTab === 'skills') return localData.skills;
+    if (activeTab === 'projects') return localData.projects || [];
+    if (activeTab === 'blogs') return localData.blogs || [];
+    if (activeTab === 'timeline') return localData.timeline?.items || [];
+    if (activeTab === 'books') return localData.books || [];
+    if (activeTab === 'skills') return localData.skills || [];
+    if (activeTab === 'gallery') return localData.gallery || [];
     return [];
   };
 
@@ -291,9 +321,16 @@ export default function Dashboard({ data, onSave, onClose }) {
                   }`}
                 >
                   <div className="flex justify-between items-start gap-2">
-                    <h4 className="text-xs font-bold text-zinc-850 dark:text-zinc-200 line-clamp-1">
-                      {item.title || item.label || `Record #${index + 1}`}
-                    </h4>
+                    <div className="flex items-center space-x-2">
+                      <h4 className="text-xs font-bold text-zinc-850 dark:text-zinc-200 line-clamp-1">
+                        {item.title || item.label || `Record #${index + 1}`}
+                      </h4>
+                      {(activeTab === 'projects' || activeTab === 'timeline') && item.showInCv !== false && (
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
+                          CV
+                        </span>
+                      )}
+                    </div>
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
@@ -435,6 +472,23 @@ export default function Dashboard({ data, onSave, onClose }) {
                 {/* 1. Projects Fields */}
                 {activeTab === 'projects' && (
                   <>
+                    <div className="md:col-span-2 flex items-center justify-between p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                      <div>
+                        <span className="block text-xs font-bold text-zinc-850 dark:text-zinc-100">Include in CV & PDF Export</span>
+                        <span className="text-[10px] font-mono text-zinc-400">Only enabled projects will be included when generating your ATS CV document.</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => updateField('projects', selectedItemIndex, 'showInCv', currentItem.showInCv === false ? true : false)}
+                        className={`px-4 py-2 rounded-full font-mono text-xs font-bold transition-all ${
+                          currentItem.showInCv !== false
+                            ? 'bg-emerald-500 text-white shadow'
+                            : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
+                        }`}
+                      >
+                        {currentItem.showInCv !== false ? '✓ INCLUDED IN CV' : '✕ EXCLUDED FROM CV'}
+                      </button>
+                    </div>
                     <div className="md:col-span-2">
                       <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Project Title</label>
                       <input 
@@ -462,12 +516,22 @@ export default function Dashboard({ data, onSave, onClose }) {
                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
                       />
                     </div>
-                    <div className="md:col-span-2">
+                    <div>
                       <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Demo Link URL</label>
                       <input 
                         type="text" 
                         value={currentItem.demoUrl || ''} 
                         onChange={(e) => updateField('projects', selectedItemIndex, 'demoUrl', e.target.value)}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Video Demo Link URL (videoUrl)</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. https://www.youtube.com/watch?v=..."
+                        value={currentItem.videoUrl || ''} 
+                        onChange={(e) => updateField('projects', selectedItemIndex, 'videoUrl', e.target.value)}
                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
                       />
                     </div>
@@ -555,6 +619,23 @@ export default function Dashboard({ data, onSave, onClose }) {
                 {/* 3. Timeline Fields */}
                 {activeTab === 'timeline' && (
                   <>
+                    <div className="md:col-span-2 flex items-center justify-between p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                      <div>
+                        <span className="block text-xs font-bold text-zinc-850 dark:text-zinc-100">Include in CV & PDF Export</span>
+                        <span className="text-[10px] font-mono text-zinc-400">Only enabled milestones will appear in your CV document and downloaded PDF.</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => updateField('timeline', selectedItemIndex, 'showInCv', currentItem.showInCv === false ? true : false)}
+                        className={`px-4 py-2 rounded-full font-mono text-xs font-bold transition-all ${
+                          currentItem.showInCv !== false
+                            ? 'bg-emerald-500 text-white shadow'
+                            : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
+                        }`}
+                      >
+                        {currentItem.showInCv !== false ? '✓ INCLUDED IN CV' : '✕ EXCLUDED FROM CV'}
+                      </button>
+                    </div>
                     <div className="md:col-span-2">
                       <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Milestone title</label>
                       <input 
@@ -691,11 +772,132 @@ export default function Dashboard({ data, onSave, onClose }) {
                         type="text" 
                         value={currentItem.pills ? currentItem.pills.join(', ') : ''} 
                         onChange={(e) => updateSkillsPills(selectedItemIndex, e.target.value)}
-                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition font-mono"
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 border-zinc-200/30 dark:border-zinc-800/20 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-855 dark:text-zinc-100 outline-none bento-transition font-mono"
                       />
                     </div>
                   </>
                 )}
+
+                {/* 6. Gallery Fields */}
+                {activeTab === 'gallery' && (() => {
+                  const existingCats = Array.from(
+                    new Set((localData.gallery || []).map(item => (item.category || '').trim().toLowerCase()))
+                  ).filter(Boolean);
+                  
+                  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                  const years = ["2024", "2025", "2026", "2027", "2028", "2029", "2030"];
+                  
+                  const dateParts = (currentItem.date || '').split(' ');
+                  const currentMonth = months.includes(dateParts[0]) ? dateParts[0] : "August";
+                  const currentYear = years.includes(dateParts[1]) ? dateParts[1] : "2026";
+                  
+                  return (
+                    <>
+                      <div className="md:col-span-2">
+                        <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Photo Title</label>
+                        <input 
+                          type="text" 
+                          value={currentItem.title || ''} 
+                          onChange={(e) => updateField('gallery', selectedItemIndex, 'title', e.target.value)}
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/30 dark:border-zinc-800/20 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Select Existing Category</label>
+                        <select 
+                          value={existingCats.includes((currentItem.category || '').toLowerCase()) ? (currentItem.category || '').toLowerCase() : ''}
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              updateField('gallery', selectedItemIndex, 'category', e.target.value);
+                            }
+                          }}
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/30 dark:border-zinc-800/20 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                        >
+                          <option value="">-- Choose Existing --</option>
+                          {existingCats.map(cat => (
+                            <option key={cat} value={cat}>{cat.toUpperCase()}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Or Type Custom Category</label>
+                        <input 
+                          type="text" 
+                          value={currentItem.category || ''} 
+                          onChange={(e) => updateField('gallery', selectedItemIndex, 'category', e.target.value)}
+                          placeholder="e.g. macro, street"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/30 dark:border-zinc-800/20 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Select Month</label>
+                        <select 
+                          value={currentMonth}
+                          onChange={(e) => {
+                            const newDate = `${e.target.value} ${currentYear}`;
+                            updateField('gallery', selectedItemIndex, 'date', newDate);
+                          }}
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/30 dark:border-zinc-800/20 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                        >
+                          {months.map(m => (
+                            <option key={m} value={m}>{m}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Select Year</label>
+                        <select 
+                          value={currentYear}
+                          onChange={(e) => {
+                            const newDate = `${currentMonth} ${e.target.value}`;
+                            updateField('gallery', selectedItemIndex, 'date', newDate);
+                          }}
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/30 dark:border-zinc-800/20 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                        >
+                          {years.map(y => (
+                            <option key={y} value={y}>{y}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Location</label>
+                        <input 
+                          type="text" 
+                          value={currentItem.location || ''} 
+                          onChange={(e) => updateField('gallery', selectedItemIndex, 'location', e.target.value)}
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/30 dark:border-zinc-800/20 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Camera Details / Settings</label>
+                        <input 
+                          type="text" 
+                          value={currentItem.camera || ''} 
+                          onChange={(e) => updateField('gallery', selectedItemIndex, 'camera', e.target.value)}
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/30 dark:border-zinc-800/20 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Online Hosted Image URL</label>
+                        <input 
+                          type="text" 
+                          value={currentItem.image || ''} 
+                          onChange={(e) => updateField('gallery', selectedItemIndex, 'image', e.target.value)}
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/30 dark:border-zinc-800/20 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition font-mono"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Photo Description</label>
+                        <textarea 
+                          rows="3"
+                          value={currentItem.desc || ''} 
+                          onChange={(e) => updateField('gallery', selectedItemIndex, 'desc', e.target.value)}
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/30 dark:border-zinc-800/20 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition resize-none"
+                        />
+                      </div>
+                    </>
+                  );
+                })()}
 
               </div>
             </div>

@@ -7,6 +7,14 @@ body {
   zoom: 0.8;
 }
 
+@media print {
+  body {
+    zoom: 1 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+  }
+}
+
 .accent-green {
   --theme-accent: #10B981; /* Emerald Green */
   --theme-accent-rgb: 16, 185, 129;
