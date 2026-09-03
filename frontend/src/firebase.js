@@ -2,14 +2,14 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
-// Environment variables configuration for Vite (Loaded securely from .env or Netlify)
+// Environment variables configuration for Vite (Loaded from .env or Netlify, with project defaults)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDNX0yuhZ7cK-btiHv6P7yJ-zIm0vNJfRs",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "srikar-portfolio-c5412.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "srikar-portfolio-c5412",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "srikar-portfolio-c5412.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "927713063016",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:927713063016:web:30158f6a47f3b52b0b8bdd"
 };
 
 // Check if Firebase configuration is provided
@@ -88,7 +88,7 @@ export const loginWithGoogle = async () => {
 
   if (user.email.toLowerCase() !== adminEmail) {
     await signOut(auth);
-    throw new Error(`Access Denied: ${user.email} is not authorized. Only ${adminEmail} can enter editor mode.`);
+    throw new Error(`Access Denied: Google account "${user.email}" is not authorized.`);
   }
 
   return user;
