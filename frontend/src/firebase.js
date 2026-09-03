@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getDatabase, ref, get, set, push } from 'firebase/database';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 // Environment variables configuration with Srikar's Firebase project defaults
 const firebaseConfig = {
@@ -82,6 +82,29 @@ export const loginAdmin = async (email, password) => {
   if (user.email.toLowerCase() !== adminEmail) {
     await signOut(auth);
     throw new Error(`Access Denied: ${user.email} is not authorized.`);
+  }
+
+  return user;
+};
+
+/**
+ * 1-Click Google Sign-In with Gmail account verification.
+ */
+export const loginWithGoogle = async () => {
+  if (!auth) {
+    throw new Error('Firebase Auth is not configured. Please add your Firebase credentials.');
+  }
+
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+
+  const result = await signInWithPopup(auth, provider);
+  const user = result.user;
+  const adminEmail = getAdminEmail();
+
+  if (user.email.toLowerCase() !== adminEmail) {
+    await signOut(auth);
+    throw new Error(`Access Denied: ${user.email} is not authorized. Only ${adminEmail} can enter editor mode.`);
   }
 
   return user;
