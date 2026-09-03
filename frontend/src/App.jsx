@@ -379,9 +379,8 @@ function MainApp() {
         const result = await fetchPortfolioFromFirebase();
         if (result && result.data) {
           setPortfolioData(result.data);
-          const sourceName = result.source === 'realtime-database' ? 'Firebase Realtime DB' : 'Firebase Firestore';
-          setDataSource(sourceName);
-          console.log(`%c[FIREBASE STATUS] Connected & Loaded from ${sourceName}`, 'color: #10b981; font-weight: bold;');
+          setDataSource('Cloud Firestore');
+          console.log('%c[FIREBASE STATUS] Connected & Loaded live from Cloud Firestore', 'color: #10b981; font-weight: bold;');
           return;
         }
       }
@@ -399,8 +398,8 @@ function MainApp() {
           }
         })
         .catch(err => {
-          setDataSource('Built-in Data (Ready to seed to Firebase)');
-          console.info('ℹ️ Using built-in portfolio data. To sync to your Firebase Realtime Database, open /dashboard and click "Save All Changes".');
+          setDataSource('Built-in Data (Ready to seed to Firestore)');
+          console.info('ℹ️ Using built-in portfolio data. To sync to Cloud Firestore, open /dashboard and click "Save All Changes".');
         });
     };
 

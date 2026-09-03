@@ -1,13 +1,11 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { getDatabase, ref, get, set, push } from 'firebase/database';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 // Environment variables configuration for Vite (Loaded securely from .env or Netlify)
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
@@ -30,40 +28,22 @@ export const getAdminEmail = () => {
 
 let app = null;
 let firestore = null;
-let rtdb = null;
 let auth = null;
 
 if (isFirebaseConfigured()) {
   try {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
-
-    // Initialize Cloud Firestore as the primary crash-proof database
-    try {
-      firestore = getFirestore(app);
-      console.log('🔥 Cloud Firestore initialized as primary database.');
-    } catch (fsErr) {
-      console.warn('Firestore initialization note:', fsErr);
-    }
-
-    // Initialize Realtime Database as secondary fallback
-    if (firebaseConfig.databaseURL) {
-      try {
-        rtdb = getDatabase(app);
-      } catch (rtdbErr) {
-        console.warn('Realtime Database fallback note:', rtdbErr);
-      }
-    }
-
-    console.log('🔥 Firebase services initialized successfully.');
+    firestore = getFirestore(app);
+    console.log('🔥 Cloud Firestore & Auth initialized successfully.');
   } catch (error) {
-    console.warn('⚠️ Firebase initialization failed:', error);
+    console.warn('⚠️ Firebase initialization note:', error);
   }
 } else {
   console.info('ℹ️ Firebase running in offline/fallback mode.');
 }
 
-export { auth, firestore, rtdb };
+export { auth, firestore };
 
 /**
  * Sign in admin user with email and password, verifying they are the authorized admin.
@@ -140,111 +120,58 @@ export const subscribeToAuth = (callback) => {
 };
 
 /**
- * Fetch portfolio data: Checks Cloud Firestore FIRST (Crash-proof), then RTDB fallback.
+ * Fetch portfolio data from Cloud Firestore 'portfolio/data' document.
  */
 export const fetchPortfolioFromFirebase = async () => {
-  // 1. Check Cloud Firestore (Primary)
-  if (firestore) {
-    try {
-      const docRef = doc(firestore, 'portfolio', 'data');
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        console.log('✅ [Cloud Firestore] Live portfolio loaded from Cloud Firestore!');
-        return { data, source: 'firestore' };
-      } else {
-        console.log('ℹ️ [Cloud Firestore] Connected, but "portfolio/data" document is not seeded yet. Click "Save All Changes" in /dashboard to seed.');
-      }
-    } catch (fsErr) {
-      console.warn('⚠️ [Cloud Firestore] Read error (check Firestore rules):', fsErr.message);
+  if (!firestore) return null;
+  try {
+    const docRef = doc(firestore, 'portfolio', 'data');
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      console.log('✅ [Cloud Firestore] Live portfolio loaded from Cloud Firestore!');
+      return { data, source: 'firestore' };
+    } else {
+      console.log('ℹ️ [Cloud Firestore] Connected, but "portfolio/data" document is not seeded yet. Click "Save All Changes" in /dashboard to seed.');
     }
+  } catch (fsErr) {
+    console.warn('⚠️ [Cloud Firestore] Read error (check Firestore rules):', fsErr.message);
   }
-
-  // 2. Fallback to Realtime Database if Firestore is not yet created
-  if (rtdb) {
-    try {
-      const portfolioRef = ref(rtdb, 'portfolio');
-      const snapshot = await get(portfolioRef);
-      if (snapshot.exists()) {
-        console.log('✅ [Firebase RTDB] Live portfolio loaded from Realtime Database!');
-        return { data: snapshot.val(), source: 'realtime-database' };
-      }
-    } catch (rtdbErr) {
-      console.warn('⚠️ [Firebase RTDB] Read error:', rtdbErr.message);
-    }
-  }
-
   return null;
 };
 
 /**
- * Save complete portfolio data: Writes to Cloud Firestore (with safe merge) and RTDB.
+ * Save complete portfolio data to Cloud Firestore with safe merge.
  */
 export const savePortfolioToFirebase = async (data) => {
-  let saved = false;
-
-  // 1. Save to Cloud Firestore (Primary crash-proof store)
-  if (firestore) {
-    try {
-      const docRef = doc(firestore, 'portfolio', 'data');
-      await setDoc(docRef, data, { merge: true });
-      console.log('✅ [Cloud Firestore] Portfolio successfully written to Cloud Firestore!');
-      saved = true;
-    } catch (error) {
-      console.error('❌ [Cloud Firestore] Save error (check Firestore Rules in Firebase Console):', error);
-    }
+  if (!firestore) return false;
+  try {
+    const docRef = doc(firestore, 'portfolio', 'data');
+    await setDoc(docRef, data, { merge: true });
+    console.log('✅ [Cloud Firestore] Portfolio successfully written to Cloud Firestore!');
+    return true;
+  } catch (error) {
+    console.error('❌ [Cloud Firestore] Save error (check Firestore Rules in Firebase Console):', error);
+    return false;
   }
-
-  // 2. Also save to Realtime Database as backup
-  if (rtdb) {
-    try {
-      const portfolioRef = ref(rtdb, 'portfolio');
-      await set(portfolioRef, data);
-      saved = true;
-    } catch (error) {
-      // Ignore if RTDB is not enabled
-    }
-  }
-
-  return saved;
 };
 
 /**
  * Save contact inquiry message to Cloud Firestore 'messages' collection.
  */
 export const saveContactMessageToFirebase = async (messageData) => {
-  let saved = false;
-
-  // 1. Save to Cloud Firestore (Primary)
-  if (firestore) {
-    try {
-      const messagesRef = collection(firestore, 'messages');
-      await addDoc(messagesRef, {
-        ...messageData,
-        createdAt: serverTimestamp(),
-        submittedAt: new Date().toISOString()
-      });
-      console.log('✅ [Cloud Firestore] Contact message saved to Firestore "messages" collection!');
-      saved = true;
-    } catch (error) {
-      console.error('❌ [Cloud Firestore] Message error (check Firestore Rules):', error);
-    }
+  if (!firestore) return false;
+  try {
+    const messagesRef = collection(firestore, 'messages');
+    await addDoc(messagesRef, {
+      ...messageData,
+      createdAt: serverTimestamp(),
+      submittedAt: new Date().toISOString()
+    });
+    console.log('✅ [Cloud Firestore] Contact message saved to Firestore "messages" collection!');
+    return true;
+  } catch (error) {
+    console.error('❌ [Cloud Firestore] Message error (check Firestore Rules):', error);
+    return false;
   }
-
-  // 2. Fallback to Realtime Database
-  if (rtdb) {
-    try {
-      const messagesRef = ref(rtdb, 'messages');
-      await push(messagesRef, {
-        ...messageData,
-        timestamp: Date.now(),
-        date: new Date().toISOString()
-      });
-      saved = true;
-    } catch (error) {
-      // Ignore
-    }
-  }
-
-  return saved;
 };
