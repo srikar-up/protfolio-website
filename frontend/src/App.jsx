@@ -15,6 +15,7 @@ import Dashboard from './components/Dashboard';
 import CV from './components/CV';
 import Gallery from './components/Gallery';
 import BlogsPage from './components/BlogsPage';
+import { fetchPortfolioFromFirebase, savePortfolioToFirebase, isFirebaseConfigured } from './firebase';
 
 
 const fallbackData = {
@@ -369,18 +370,41 @@ function MainApp() {
     window.scrollTo(0, 0);
   };
 
+  const [dataSource, setDataSource] = useState('Checking...');
+
   useEffect(() => {
-    fetch('/api/portfolio')
-      .then(res => {
-        if (!res.ok) throw new Error('API error');
-        return res.json();
-      })
-      .then(data => {
-        if (data) setPortfolioData(data);
-      })
-      .catch(err => {
-        console.warn('Backend portfolio API offline, using fallback frontend data:', err);
-      });
+    const loadPortfolioData = async () => {
+      // 1. Try fetching from Firebase (Realtime Database or Firestore)
+      if (isFirebaseConfigured()) {
+        const result = await fetchPortfolioFromFirebase();
+        if (result && result.data) {
+          setPortfolioData(result.data);
+          const sourceName = result.source === 'realtime-database' ? 'Firebase Realtime DB' : 'Firebase Firestore';
+          setDataSource(sourceName);
+          console.log(`%c[FIREBASE STATUS] Connected & Loaded from ${sourceName}`, 'color: #10b981; font-weight: bold;');
+          return;
+        }
+      }
+
+      // 2. Fallback to local Express API if running locally
+      fetch('/api/portfolio')
+        .then(res => {
+          if (!res.ok) throw new Error('API error');
+          return res.json();
+        })
+        .then(data => {
+          if (data) {
+            setPortfolioData(data);
+            setDataSource('Local Express Server');
+          }
+        })
+        .catch(err => {
+          setDataSource('Built-in Data (Ready to seed to Firebase)');
+          console.info('ℹ️ Using built-in portfolio data. To sync to your Firebase Realtime Database, open /dashboard and click "Save All Changes".');
+        });
+    };
+
+    loadPortfolioData();
   }, []);
 
   const handleToggleCvProject = (projectId) => {
@@ -390,11 +414,19 @@ function MainApp() {
       if (proj) {
         proj.showInCv = proj.showInCv === false ? true : false;
       }
+      
+      // Sync with Firebase Firestore
+      if (isFirebaseConfigured()) {
+        savePortfolioToFirebase(updated).catch(err => console.warn('Could not sync CV toggle with Firebase:', err));
+      }
+
+      // Sync with local Express backend API
       fetch('/api/portfolio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
-      }).catch(err => console.warn('Could not sync CV toggle with server:', err));
+      }).catch(err => console.warn('Could not sync CV toggle with local server:', err));
+      
       return updated;
     });
   };
@@ -468,7 +500,13 @@ function MainApp() {
       </main>
 
       {/* Global Footer - Only show on home page */}
-      {!isDashboard && !isCV && !isGallery && !isBlogs && <Footer onToggleDashboard={() => navigateTo('/dashboard')} navigateTo={navigateTo} />}
+      {!isDashboard && !isCV && !isGallery && !isBlogs && (
+        <Footer 
+          onToggleDashboard={() => navigateTo('/dashboard')} 
+          navigateTo={navigateTo}
+          dataSource={dataSource} 
+        />
+      )}
 
       {/* Interactive message toast notification module */}
       <div 

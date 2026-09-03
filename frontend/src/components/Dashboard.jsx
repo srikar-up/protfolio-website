@@ -1,13 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { savePortfolioToFirebase, isFirebaseConfigured, logoutAdmin, subscribeToAuth } from '../firebase';
+import AdminLogin from './AdminLogin';
 
 export default function Dashboard({ data, onSave, onClose }) {
   const { showToast } = useTheme();
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('hero');
   
   // Clone data to local state to support editing before saving
   const [localData, setLocalData] = useState(JSON.parse(JSON.stringify(data)));
   const [selectedItemIndex, setSelectedItemIndex] = useState(0);
+
+  // Subscribe to Firebase Authentication
+  useEffect(() => {
+    const unsubscribe = subscribeToAuth((user) => {
+      setCurrentUser(user);
+      setIsAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Synchronize localData with incoming data changes (e.g. from backend fetch)
   useEffect(() => {
@@ -32,6 +45,17 @@ export default function Dashboard({ data, onSave, onClose }) {
   };
 
   const handleSave = async () => {
+    let savedSuccessfully = false;
+
+    // 1. Save to Firebase Firestore if configured
+    if (isFirebaseConfigured()) {
+      const firebaseSuccess = await savePortfolioToFirebase(localData);
+      if (firebaseSuccess) {
+        savedSuccessfully = true;
+      }
+    }
+
+    // 2. Try saving to local Express backend server if available
     try {
       const response = await fetch('/api/portfolio', {
         method: 'POST',
@@ -39,14 +63,21 @@ export default function Dashboard({ data, onSave, onClose }) {
         body: JSON.stringify(localData)
       });
       if (response.ok) {
-        showToast('Portfolio data saved successfully!');
-        onSave(localData); // Update main App state
-      } else {
-        throw new Error('Save failed');
+        savedSuccessfully = true;
       }
     } catch (err) {
-      console.error(err);
-      showToast('Error saving data to server.');
+      console.warn('Local Express server save failed or offline:', err);
+    }
+
+    // 3. Update local state & show feedback
+    if (savedSuccessfully) {
+      showToast('⚡ Successfully synced & saved to Cloud Firestore!');
+      onSave(localData); // Update main App state
+    } else if (!isFirebaseConfigured()) {
+      showToast('Saved to local state (Firebase keys missing)');
+      onSave(localData);
+    } else {
+      showToast('⚠️ Could not write to Firebase. Check Firestore Rules in Firebase Console.');
     }
   };
 
@@ -241,21 +272,57 @@ export default function Dashboard({ data, onSave, onClose }) {
   const activeList = getActiveList();
   const currentItem = activeList[selectedItemIndex] || null;
 
+  // 1. Loading state during auth check
+  if (isAuthLoading) {
+    return (
+      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <span className="w-8 h-8 border-2 border-brand-orange border-t-transparent rounded-full animate-spin"></span>
+        <p className="text-xs font-mono text-zinc-400">Verifying admin access...</p>
+      </div>
+    );
+  }
+
+  // 2. Unauthenticated Gate: Show AdminLogin
+  if (!currentUser) {
+    return (
+      <AdminLogin 
+        onLoginSuccess={(user) => setCurrentUser(user)}
+        onClose={onClose}
+      />
+    );
+  }
+
   return (
     <section className="lg:col-span-12 w-full bg-transparent min-h-[85vh] py-6 flex flex-col gap-8 relative select-none">
       
       {/* Dashboard Header Bar */}
-      <div className="flex justify-between items-center bg-white dark:bg-brand-darkCard rounded-[2rem] p-6 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 bento-transition">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-brand-darkCard rounded-[2rem] p-6 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 bento-transition">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-bold">ADMIN PANEL</span>
+          <div className="flex items-center space-x-2">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-brand-orange font-bold">ADMIN PANEL</span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
+              VERIFIED: {currentUser.email}
+            </span>
+          </div>
           <h1 className="font-syne font-bold text-2xl text-zinc-900 dark:text-white mt-1">Portfolio Control Desk</h1>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button 
             onClick={handleSave} 
             className="px-6 py-2.5 bg-brand-orange text-white rounded-full font-semibold text-xs shadow-md hover:scale-105 active:scale-95 bento-transition"
           >
             Save All Changes
+          </button>
+          <button 
+            onClick={async () => {
+              await logoutAdmin();
+              setCurrentUser(null);
+              showToast('Signed out of Control Desk.');
+            }}
+            className="px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-full font-semibold text-xs hover:scale-105 active:scale-95 bento-transition"
+            title="Sign out of editor mode"
+          >
+            Sign Out
           </button>
           <button 
             onClick={onClose} 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { saveContactMessageToFirebase, isFirebaseConfigured } from '../firebase';
 
 export default function Contact() {
   const { showToast } = useTheme();
@@ -21,6 +22,20 @@ export default function Contact() {
     }
 
     setStatus('sending');
+
+    // 1. Send to Firebase Firestore if configured
+    if (isFirebaseConfigured()) {
+      const success = await saveContactMessageToFirebase(formData);
+      if (success) {
+        setStatus('success');
+        setStatusMsg(`Thank you, ${formData.name}! Your message has been sent successfully.`);
+        showToast(`Thank you, ${formData.name}! Message sent.`);
+        setFormData({ name: '', email: '', message: '' });
+        return;
+      }
+    }
+
+    // 2. Fallback to local Express API if server is running
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -38,7 +53,7 @@ export default function Contact() {
     } catch (err) {
       setStatus('error');
       setStatusMsg(err.message || 'Something went wrong. Please try again.');
-      showToast('Submission failed. Check backend.');
+      showToast('Submission failed.');
     }
   };
 

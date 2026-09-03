@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 
-export default function Footer({ onToggleDashboard, navigateTo }) {
+export default function Footer({ onToggleDashboard, navigateTo, dataSource }) {
   const { showToast } = useTheme();
   const currentYear = new Date().getFullYear();
   const [clickCount, setClickCount] = React.useState(0);
@@ -152,9 +152,15 @@ export default function Footer({ onToggleDashboard, navigateTo }) {
         >
           © {currentYear} AURA DESIGN LAB. ALL RIGHTS RESERVED.
         </div>
-        <div className="flex items-center space-x-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          <span>COMPOSITION ENGINE V2.0</span>
+        <div className="flex items-center space-x-2 font-mono">
+          <span className={`w-2 h-2 rounded-full ${
+            dataSource && dataSource.includes('Firebase') 
+              ? 'bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50' 
+              : 'bg-amber-500'
+          }`}></span>
+          <span className="text-[10px] tracking-wide uppercase">
+            DB: {dataSource || 'Checking...'}
+          </span>
         </div>
       </div>
 
