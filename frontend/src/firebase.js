@@ -3,20 +3,24 @@ import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp 
 import { getDatabase, ref, get, set, push } from 'firebase/database';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
-// Environment variables configuration with Srikar's Firebase project defaults
+// Environment variables configuration for Vite (Loaded securely from .env or Netlify)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDNX0yuhZ7cK-btiHv6P7yJ-zIm0vNJfRs",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "srikar-portfolio-c5412.firebaseapp.com",
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || "https://srikar-portfolio-c5412-default-rtdb.firebaseio.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "srikar-portfolio-c5412",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "srikar-portfolio-c5412.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "927713063016",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:927713063016:web:30158f6a47f3b52b0b8bdd"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Check if Firebase configuration is provided
 export const isFirebaseConfigured = () => {
-  return Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
+  return Boolean(
+    firebaseConfig.apiKey && 
+    firebaseConfig.projectId &&
+    firebaseConfig.apiKey !== 'YOUR_FIREBASE_API_KEY'
+  );
 };
 
 // Allowed admin email (defaults to Srikar's email)

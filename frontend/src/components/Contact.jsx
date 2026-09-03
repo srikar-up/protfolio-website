@@ -4,9 +4,10 @@ import { saveContactMessageToFirebase, isFirebaseConfigured } from '../firebase'
 
 export default function Contact() {
   const { showToast } = useTheme();
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '', honeypot: '' });
   const [status, setStatus] = useState('idle'); // idle, sending, success, error
   const [statusMsg, setStatusMsg] = useState('');
+  const [lastSubmittedAt, setLastSubmittedAt] = useState(0);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -14,42 +15,83 @@ export default function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
+
+    // 1. Anti-Spam Bot Trap: If honeypot filled, silently drop
+    if (formData.honeypot) {
+      console.warn('Bot detected and blocked.');
+      setStatus('success');
+      setStatusMsg('Thank you! Your message has been received.');
+      return;
+    }
+
+    const trimmedName = formData.name.trim().slice(0, 100);
+    const trimmedEmail = formData.email.trim().slice(0, 100);
+    const trimmedMessage = formData.message.trim().slice(0, 2000);
+
+    // 2. Input presence check
+    if (!trimmedName || !trimmedEmail || !trimmedMessage) {
       setStatus('error');
       setStatusMsg('Please fill in all fields.');
       showToast('Please fill in all fields.');
       return;
     }
 
+    // 3. Email format regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      setStatus('error');
+      setStatusMsg('Please enter a valid email address.');
+      showToast('Invalid email address.');
+      return;
+    }
+
+    // 4. Rate limiting: 20-second cooldown per session
+    const now = Date.now();
+    if (now - lastSubmittedAt < 20000) {
+      const waitSecs = Math.ceil((20000 - (now - lastSubmittedAt)) / 1000);
+      setStatus('error');
+      setStatusMsg(`Please wait ${waitSecs}s before sending another inquiry.`);
+      showToast(`Rate limit: wait ${waitSecs}s.`);
+      return;
+    }
+
+    const sanitizedData = {
+      name: trimmedName,
+      email: trimmedEmail,
+      message: trimmedMessage
+    };
+
     setStatus('sending');
 
-    // 1. Send to Firebase Firestore if configured
+    // 5. Send to Firebase Firestore if configured
     if (isFirebaseConfigured()) {
-      const success = await saveContactMessageToFirebase(formData);
+      const success = await saveContactMessageToFirebase(sanitizedData);
       if (success) {
         setStatus('success');
-        setStatusMsg(`Thank you, ${formData.name}! Your message has been sent successfully.`);
-        showToast(`Thank you, ${formData.name}! Message sent.`);
-        setFormData({ name: '', email: '', message: '' });
+        setLastSubmittedAt(Date.now());
+        setStatusMsg(`Thank you, ${trimmedName}! Your message has been sent successfully.`);
+        showToast(`Thank you, ${trimmedName}! Message sent.`);
+        setFormData({ name: '', email: '', message: '', honeypot: '' });
         return;
       }
     }
 
-    // 2. Fallback to local Express API if server is running
+    // 6. Fallback to local Express API if server is running
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(sanitizedData),
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Submission failed');
 
       setStatus('success');
+      setLastSubmittedAt(Date.now());
       setStatusMsg(data.message || 'Message sent successfully!');
-      showToast(`Thank you, ${formData.name}! Message sent.`);
-      setFormData({ name: '', email: '', message: '' });
+      showToast(`Thank you, ${trimmedName}! Message sent.`);
+      setFormData({ name: '', email: '', message: '', honeypot: '' });
     } catch (err) {
       setStatus('error');
       setStatusMsg(err.message || 'Something went wrong. Please try again.');
@@ -97,6 +139,18 @@ export default function Contact() {
         {/* Right Column: Contact form */}
         <div className="flex-1 bg-zinc-50 dark:bg-zinc-900/40 rounded-2xl p-6 md:p-8 border border-zinc-200/10 dark:border-zinc-800/10">
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Anti-Spam Honeypot Bot Trap */}
+            <div className="hidden" aria-hidden="true" style={{ display: 'none' }}>
+              <input 
+                type="text" 
+                name="honeypot" 
+                tabIndex={-1} 
+                value={formData.honeypot} 
+                onChange={handleChange} 
+                autoComplete="off" 
+              />
+            </div>
+
             <div>
               <label htmlFor="name" className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Your Name</label>
               <input 
