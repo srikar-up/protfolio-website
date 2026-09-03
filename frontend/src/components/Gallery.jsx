@@ -337,10 +337,30 @@ export default function Gallery({ data, onClose }) {
         </div>
       </div>
 
+      {/* Mobile Horizontal Category Pills (flows with scroll on mobile) */}
+      <div className="lg:hidden flex items-center space-x-2 overflow-x-auto pb-4 scrollbar-none w-full select-none mb-4">
+        {categories.map((cat) => {
+          const isActive = selectedCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`px-4 py-2 rounded-full text-xs font-mono font-semibold whitespace-nowrap bento-transition flex-shrink-0 ${
+                isActive
+                  ? `${bgAccent} text-white shadow-sm scale-[1.02]`
+                  : 'bg-white dark:bg-brand-darkCard border border-zinc-200/50 dark:border-zinc-800/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+              }`}
+            >
+              {cat.title}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Main Layout Split */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Category Timeline Menu (4 cols wide) */}
-        <div className="lg:col-span-4 space-y-6">
+        {/* Left Column: Category Timeline Menu (Desktop: sticky, follows scroll smoothly) */}
+        <div className="hidden lg:block lg:col-span-4 space-y-6 lg:sticky lg:top-24 self-start">
           <section className="bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20">
             <div>
               <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-450 dark:text-zinc-500">Filter Split</span>

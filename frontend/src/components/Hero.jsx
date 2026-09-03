@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 
 export default function Hero({ data, navigateTo }) {
@@ -11,28 +11,10 @@ export default function Hero({ data, navigateTo }) {
     cardCourse: "B.Tech Data Science with ML",
     cardEmail: "srikarsensai@gmail.com",
     cardLinkedin: "srikar-maddela",
-    cardGithub: "srikar-up"
+    cardGithub: "srikar-up",
+    cardYoutube: "@devstonks"
   };
   const { showToast } = useTheme();
-  const [apiStatus, setApiStatus] = useState('connecting');
-  const [apiMessage, setApiMessage] = useState('Connecting to Express...');
-
-  useEffect(() => {
-    fetch('/api/status')
-      .then((res) => {
-        if (!res.ok) throw new Error('Server error');
-        return res.json();
-      })
-      .then((data) => {
-        setApiStatus('online');
-        setApiMessage(data.message || 'Express Active');
-      })
-      .catch(() => {
-        setApiStatus('offline');
-        setApiMessage('Express Offline');
-      });
-  }, []);
-
   const [isFlipped, setIsFlipped] = useState(false);
 
   const handleDownloadCV = () => {
@@ -60,26 +42,14 @@ export default function Hero({ data, navigateTo }) {
   return (
     <section className="lg:col-span-12 w-full flex flex-col items-center justify-between min-h-[92vh] py-8 lg:py-12 relative overflow-hidden select-none">
       
-
-      
       {/* Main Narrative & Card split container */}
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10 my-auto pt-6">
         {/* Left Column: Bio / Pitch */}
         <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
-          {/* Pulsing state badge */}
-          <div className={`inline-flex items-center space-x-2 border px-4 py-1.5 rounded-full text-xs font-semibold mb-8 animate-pulse ${
-            apiStatus === 'online'
-              ? 'bg-emerald-500/15 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-              : apiStatus === 'offline'
-              ? 'bg-orange-500/15 border-orange-500/20 text-orange-600 dark:text-orange-400'
-              : 'bg-blue-500/15 border-blue-500/20 text-blue-600 dark:text-blue-400'
-          }`}>
-            <span className={`w-2.5 h-2.5 rounded-full ${
-              apiStatus === 'online' ? 'bg-emerald-500' : apiStatus === 'offline' ? 'bg-orange-500' : 'bg-blue-500'
-            }`}></span>
-            <span id="badge-status-text">
-              {apiStatus === 'online' ? 'Express Backend Server Online' : apiMessage}
-            </span>
+          {/* Professional Availability Badge */}
+          <div className="inline-flex items-center space-x-2 border px-4 py-1.5 rounded-full text-xs font-semibold mb-8 bg-emerald-500/15 border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+            <span id="badge-status-text">AVAILABLE FOR ROLES & INNOVATIVE PROJECTS</span>
           </div>
 
           <h1 className="font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.15] text-zinc-900 dark:text-white mb-6">
@@ -95,8 +65,17 @@ export default function Hero({ data, navigateTo }) {
             {heroData.bio}
           </p>
 
-          <div className="flex flex-row items-center gap-4">
-            <button onClick={handleDownloadCV} className="px-8 py-4 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-full font-semibold text-sm shadow-md hover:scale-105 active:scale-95 bento-transition">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+            <button 
+              onClick={scrollToProjects}
+              className="bg-brand-orange hover:bg-brand-orangeHover text-white px-7 py-3.5 rounded-full font-semibold text-xs shadow-soft hover:shadow-orange-glow active:scale-95 bento-transition focus:outline-none"
+            >
+              Explore Portfolio
+            </button>
+            <button 
+              onClick={handleDownloadCV}
+              className="border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm text-zinc-800 dark:text-zinc-200 px-7 py-3.5 rounded-full font-semibold text-xs active:scale-95 bento-transition focus:outline-none"
+            >
               Get CV
             </button>
             
@@ -170,34 +149,38 @@ export default function Hero({ data, navigateTo }) {
                   </div>
                 </div>
 
-                {/* Editor Content Area */}
-                <div className="flex-1 font-mono text-[9px] sm:text-[10px] leading-relaxed pt-3 text-zinc-700 dark:text-zinc-300 overflow-y-auto whitespace-pre">
+                {/* Editor Content Area with Direct Clickable URLs */}
+                <div className="flex-1 font-mono text-[8.5px] sm:text-[9.5px] leading-relaxed pt-2 text-zinc-700 dark:text-zinc-300 overflow-y-auto whitespace-pre">
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">1</span>
                     <span><span className="text-orange-500 dark:text-orange-400 font-medium">"business_card"</span>: {"{"}</span>
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">2</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"name"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardName}"</span>,</span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"name"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardName || 'Srikar'}"</span>,</span>
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">3</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"course"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardCourse}"</span>,</span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"course"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardCourse || 'B.Tech Data Science with ML'}"</span>,</span>
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">4</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"email"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardEmail}"</span>,</span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"email"</span>: <a href="mailto:srikarsensai@gmail.com" onClick={(e) => e.stopPropagation()} className="text-emerald-600 dark:text-emerald-400 hover:underline">"srikarsensai@gmail.com"</a>,</span>
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">5</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"linkedin"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardLinkedin}"</span>,</span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"linkedin"</span>: <a href="http://www.linkedin.com/in/srikar-maddela" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-emerald-600 dark:text-emerald-400 hover:underline">"srikar-maddela"</a>,</span>
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">6</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"github"</span>: <span className="text-emerald-600 dark:text-emerald-400">"{heroData.cardGithub}"</span></span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"github"</span>: <a href="https://github.com/srikar-up" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-emerald-600 dark:text-emerald-400 hover:underline">"srikar-up"</a>,</span>
                   </div>
                   <div className="flex">
-                    <span className="text-zinc-400 dark:text-zinc-650 select-none w-5 text-right pr-2">7</span>
+                    <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">7</span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"youtube"</span>: <a href="https://youtube.com/@devstonks?si=e-9bdTSIavw2EX9p" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-emerald-600 dark:text-emerald-400 hover:underline">"@devstonks"</a></span>
+                  </div>
+                  <div className="flex">
+                    <span className="text-zinc-400 dark:text-zinc-650 select-none w-5 text-right pr-2">8</span>
                     <span>{"}"}</span>
                   </div>
                 </div>

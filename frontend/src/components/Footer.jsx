@@ -39,13 +39,13 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource }) {
             <svg className="w-6 h-6 text-zinc-900 dark:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polygon points="12 3 2 21 22 21"/>
             </svg>
-            <span className="font-syne font-bold text-lg text-zinc-900 dark:text-white tracking-wide">Aura Design Lab</span>
+            <span className="font-syne font-bold text-lg text-zinc-900 dark:text-white tracking-wide">Srikar Proto</span>
           </div>
           <p className="text-[11px] leading-relaxed text-zinc-400 dark:text-zinc-500">
             Fusing physical depth with tactile layouts. Building high-performance visual frameworks that load instantly and respond to human interaction.
           </p>
-          <div className="text-zinc-955 dark:text-white font-semibold">
-            <a href="mailto:hey.@aura-design.com" className="hover:text-brand-orange bento-transition">hey.@aura-design.com</a>
+          <div className="text-zinc-955 dark:text-white font-semibold font-mono text-xs">
+            <a href="mailto:srikarsensai@gmail.com" className="hover:text-brand-orange bento-transition">srikarsensai@gmail.com</a>
           </div>
         </div>
 
@@ -120,12 +120,49 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource }) {
           {/* Column 2: Socials */}
           <div className="space-y-3">
             <h4 className="text-[10px] uppercase font-bold tracking-widest text-zinc-900 dark:text-white">Social Connect</h4>
-            <ul className="space-y-2 text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
-              <li><button onClick={() => handleLinkClick("Twitter")} className="hover:text-brand-orange text-left bento-transition">Twitter</button></li>
-              <li><button onClick={() => handleLinkClick("LinkedIn")} className="hover:text-brand-orange text-left bento-transition">LinkedIn</button></li>
-              <li><button onClick={() => handleLinkClick("GitHub")} className="hover:text-brand-orange text-left bento-transition">GitHub</button></li>
-              <li><button onClick={() => handleLinkClick("Read.cv")} className="hover:text-brand-orange text-left bento-transition">Read.cv</button></li>
-              <li><button onClick={() => handleLinkClick("Dribbble")} className="hover:text-brand-orange text-left bento-transition">Dribbble</button></li>
+            <ul className="space-y-2.5 text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
+              <li>
+                <a 
+                  href="https://github.com/srikar-up" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-brand-orange text-left bento-transition inline-flex items-center space-x-1"
+                >
+                  <span>GitHub</span>
+                  <span className="text-[9px] opacity-60">↗</span>
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="http://www.linkedin.com/in/srikar-maddela" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-brand-orange text-left bento-transition inline-flex items-center space-x-1"
+                >
+                  <span>LinkedIn</span>
+                  <span className="text-[9px] opacity-60">↗</span>
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://youtube.com/@devstonks?si=e-9bdTSIavw2EX9p" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-brand-orange text-left bento-transition inline-flex items-center space-x-1"
+                >
+                  <span>YouTube</span>
+                  <span className="text-[9px] opacity-60">↗</span>
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="mailto:srikarsensai@gmail.com" 
+                  className="hover:text-brand-orange text-left bento-transition inline-flex items-center space-x-1"
+                >
+                  <span>Email</span>
+                  <span className="text-[9px] opacity-60">↗</span>
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -150,11 +187,11 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource }) {
           className="cursor-pointer hover:text-brand-orange bento-transition"
           title="Admin Access Key"
         >
-          © {currentYear} AURA DESIGN LAB. ALL RIGHTS RESERVED.
+          © {currentYear} SRIKAR PROTO. ALL RIGHTS RESERVED.
         </div>
         <div className="flex items-center space-x-2 font-mono">
           <span className={`w-2 h-2 rounded-full ${
-            dataSource && dataSource.includes('Firebase') 
+            dataSource && dataSource.includes('Firestore') 
               ? 'bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50' 
               : 'bg-amber-500'
           }`}></span>
@@ -166,7 +203,7 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource }) {
 
       {/* Huge Decorative Branding text */}
       <div className="max-w-6xl mx-auto text-[10vw] font-bold font-syne text-zinc-200/35 dark:text-zinc-900/10 tracking-tighter uppercase text-center mt-12 select-none leading-none">
-        Aura
+        Proto
       </div>
     </footer>
   );

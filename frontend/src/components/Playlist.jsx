@@ -14,7 +14,7 @@ export default function Playlist() {
     if (!isPlaying) {
       showToast("Streaming ambient audio stream...");
       setSong({
-        title: 'Aura Pulse',
+        title: 'Proto Pulse',
         artist: 'Ambient Space Lo-Fi'
       });
     } else {

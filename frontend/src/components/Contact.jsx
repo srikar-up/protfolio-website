@@ -123,11 +123,11 @@ export default function Contact() {
           <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800/40 text-xs font-mono text-zinc-400 dark:text-zinc-500 space-y-2">
             <div className="flex justify-between max-w-xs">
               <span>EMAIL:</span>
-              <span className="text-zinc-800 dark:text-zinc-200 hover:text-brand-orange bento-transition cursor-pointer">hey.@aura-design.com</span>
+              <a href="mailto:srikarsensai@gmail.com" className="text-zinc-800 dark:text-zinc-200 hover:text-brand-orange bento-transition">srikarsensai@gmail.com</a>
             </div>
             <div className="flex justify-between max-w-xs">
               <span>LOCATION:</span>
-              <span className="text-zinc-800 dark:text-zinc-200">Montreal, Canada</span>
+              <span className="text-zinc-800 dark:text-zinc-200">Punjab, India</span>
             </div>
             <div className="flex justify-between max-w-xs">
               <span>AVAILABILITY:</span>

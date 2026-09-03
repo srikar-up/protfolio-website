@@ -68,7 +68,7 @@ export default function Header({ navigateTo, isCV }) {
             <svg className="w-6 h-6 text-zinc-900 dark:text-white transition-transform duration-500 group-hover:rotate-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round">
               <polygon points="12 3 2 21 22 21"/>
             </svg>
-            <span className="hidden sm:inline font-mono text-[11px] tracking-widest text-zinc-400 dark:text-zinc-500 font-medium">hey.@aura-design.com</span>
+            <span className="hidden sm:inline font-mono text-[11px] tracking-widest text-zinc-400 dark:text-zinc-500 font-medium group-hover:text-brand-orange bento-transition">srikarsensai@gmail.com</span>
           </button>
         </div>
 
@@ -151,7 +151,7 @@ export default function Header({ navigateTo, isCV }) {
               
               <div className="p-2 border-b border-zinc-100 dark:border-zinc-800/60 mb-1.5 flex justify-between items-center">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 dark:text-zinc-500">Navigation</span>
-                <span className="text-[9px] px-2 py-0.5 rounded-full bg-brand-orange/10 text-brand-orange font-bold">AURA LAB</span>
+                <span className="text-[9px] px-2 py-0.5 rounded-full bg-brand-orange/10 text-brand-orange font-bold">SRIKAR PROTO</span>
               </div>
 
               <nav className="space-y-1">
