@@ -67,14 +67,8 @@ export default function Hero({ data, navigateTo }) {
 
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
             <button 
-              onClick={scrollToProjects}
-              className="bg-brand-orange hover:bg-brand-orangeHover text-white px-7 py-3.5 rounded-full font-semibold text-xs shadow-soft hover:shadow-orange-glow active:scale-95 bento-transition focus:outline-none"
-            >
-              Explore Portfolio
-            </button>
-            <button 
               onClick={handleDownloadCV}
-              className="border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm text-zinc-800 dark:text-zinc-200 px-7 py-3.5 rounded-full font-semibold text-xs active:scale-95 bento-transition focus:outline-none"
+              className="bg-brand-orange hover:bg-brand-orangeHover text-white px-8 py-3.5 rounded-full font-semibold text-xs shadow-soft hover:shadow-orange-glow active:scale-95 bento-transition focus:outline-none"
             >
               Get CV
             </button>

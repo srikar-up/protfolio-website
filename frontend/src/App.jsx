@@ -436,7 +436,7 @@ function MainApp() {
   const isBlogs = currentPath === '/blogs';
 
   return (
-    <div className="bg-brand-lightBg dark:bg-brand-darkBg text-zinc-800 dark:text-zinc-200 font-sans antialiased transition-colors duration-500 selection:bg-orange-500/10 overflow-x-hidden min-h-screen">
+    <div className="bg-brand-lightBg dark:bg-brand-darkBg text-zinc-800 dark:text-zinc-200 font-sans antialiased transition-colors duration-500 selection:bg-orange-500/10 overflow-x-clip min-h-screen">
       
       {/* Site Header Controls - Only show on home or CV page */}
       {!isDashboard && <Header navigateTo={navigateTo} isCV={isCV || isGallery || isBlogs} />}
