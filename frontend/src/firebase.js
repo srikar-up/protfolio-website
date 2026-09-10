@@ -157,6 +157,22 @@ export const savePortfolioToFirebase = async (data) => {
 };
 
 /**
+ * Cache and update GitHub KPI metrics in Cloud Firestore
+ */
+export const updateGithubKpiInFirebase = async (kpiMetrics) => {
+  if (!firestore) return false;
+  try {
+    const docRef = doc(firestore, 'portfolio', 'data');
+    await setDoc(docRef, { githubKpi: kpiMetrics }, { merge: true });
+    console.log('✅ [Cloud Firestore] Synced GitHub KPI metrics to Firestore!');
+    return true;
+  } catch (err) {
+    console.warn('ℹ️ [Cloud Firestore] Could not cache GitHub KPI (offline/rules):', err.message);
+    return false;
+  }
+};
+
+/**
  * Save contact inquiry message to Cloud Firestore 'messages' collection.
  */
 export const saveContactMessageToFirebase = async (messageData) => {

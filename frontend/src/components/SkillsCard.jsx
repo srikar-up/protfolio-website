@@ -1,30 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { playTactileClick } from '../utils/sound';
 
 export default function SkillsCard({ skills = [] }) {
   const { showToast } = useTheme();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isRippling, setIsRippling] = useState(false);
+  const cardSectionRef = useRef(null);
 
   const skillCategories = skills;
 
-  const cycleNext = () => {
+  // Trigger ripple effect whenever user enters the section after scrolling
+  useEffect(() => {
+    let timer = null;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // Restart ripple animation on entry
+          setIsRippling(false);
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            setIsRippling(true);
+          }, 50);
+        } else {
+          setIsRippling(false);
+          clearTimeout(timer);
+        }
+      },
+      {
+        threshold: 0.25 // Triggers smoothly when deck enters view
+      }
+    );
+
+    if (cardSectionRef.current) {
+      observer.observe(cardSectionRef.current);
+    }
+
+    return () => {
+      clearTimeout(timer);
+      if (cardSectionRef.current) {
+        observer.unobserve(cardSectionRef.current);
+      }
+    };
+  }, []);
+
+
+  // Directly shuffles to the next card when clicked
+  const handleDeckShuffle = (e) => {
+    if (e) e.stopPropagation();
     if (skillCategories.length === 0) return;
-    setActiveIndex(prev => (prev + 1) % skillCategories.length);
+    
+    playTactileClick(980);
+    const nextIndex = (activeIndex + 1) % skillCategories.length;
+    setActiveIndex(nextIndex);
+    showToast(`Shuffled to: ${skillCategories[nextIndex].title}`);
+
+    // Dismiss cue when user interacts manually
+    setIsRippling(false);
   };
 
-  const cyclePrev = () => {
-    if (skillCategories.length === 0) return;
-    setActiveIndex(prev => (prev - 1 + skillCategories.length) % skillCategories.length);
-  };
-
-  const handleCardClick = (index) => {
-    setActiveIndex(index);
-    showToast(`Category switched to: ${skillCategories[index].title}`);
-  };
 
   const currentCategory = skillCategories[activeIndex] || { title: '', subtitle: '', pills: [] };
 
-  // Helper to determine style of stack cards
+  // Helper to determine style of stack cards (Original slanted 3D fanned deck)
   const getCardStyle = (index) => {
     if (skillCategories.length === 0) return {};
     // Relative position in the stack (offset from activeIndex)
@@ -68,17 +106,43 @@ export default function SkillsCard({ skills = [] }) {
   return (
     <div id="skills-card" className="lg:col-span-4 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 min-h-[420px] flex flex-col justify-between bento-transition explode-level-1">
       <div>
-        <h2 className="text-xs font-mono uppercase tracking-widest text-brand-orange font-bold mb-6">My Skills Set</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xs font-mono uppercase tracking-widest text-brand-orange font-bold">My Skills Set</h2>
+          <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse"></span>
+            Tap card to shuffle
+          </span>
+        </div>
         
-        {/* Stack of Cards (Representing skill categories) */}
-        <div className="relative h-44 w-full flex items-center justify-center overflow-visible mb-6">
+        {/* Interactive Stack of Cards - Reverted to original amazing slanted animation */}
+        <div 
+          ref={cardSectionRef}
+          onClick={handleDeckShuffle}
+          className="relative h-44 w-full flex items-center justify-center overflow-visible mb-6 cursor-pointer group select-none"
+          title="Click to shuffle skill deck"
+        >
+          {/* Small Fingertip-Sized Circle that moves towards card & ripples on scroll entry */}
+          {isRippling && (
+            <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
+              <div className="relative flex items-center justify-center animate-fingertip-move">
+                {/* Fingertip circle */}
+                <div className="w-[22px] h-[22px] rounded-full border-2 border-brand-orange bg-brand-orange/30 shadow-[0_0_12px_rgba(255,69,0,0.65)] flex items-center justify-center backdrop-blur-[1px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
+                </div>
+                {/* Small localized fingertip ripples */}
+                <span className="absolute w-[22px] h-[22px] rounded-full border border-brand-orange animate-fingertip-ripple-1 pointer-events-none" />
+                <span className="absolute w-[22px] h-[22px] rounded-full border border-brand-orange/60 animate-fingertip-ripple-2 pointer-events-none" />
+              </div>
+            </div>
+          )}
+
+
           {skillCategories.map((category, index) => {
             const style = getCardStyle(index);
             const isActive = index === activeIndex;
             return (
               <div
-                key={category.id}
-                onClick={() => handleCardClick(index)}
+                key={category.id || index}
                 style={style}
                 className={`absolute w-44 h-28 rounded-2xl bg-gradient-to-br ${category.bgColor} text-white p-4 shadow-md flex flex-col justify-between cursor-pointer bento-transition select-none`}
               >
@@ -105,7 +169,10 @@ export default function SkillsCard({ skills = [] }) {
           {currentCategory.pills.map((pill, idx) => (
             <span 
               key={idx}
-              onClick={() => showToast(`Skill details: ${pill}`)}
+              onClick={(e) => {
+                e.stopPropagation();
+                showToast(`Skill details: ${pill}`);
+              }}
               className="text-[10px] font-mono font-medium px-2.5 py-1 rounded-full border bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200/40 dark:border-zinc-800/40 text-zinc-600 dark:text-zinc-400 hover:border-brand-orange hover:text-brand-orange dark:hover:text-white cursor-pointer bento-transition"
             >
               {pill}
@@ -114,26 +181,26 @@ export default function SkillsCard({ skills = [] }) {
         </div>
       </div>
 
-      {/* Navigation Arrows at bottom footer */}
-      <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/40 flex items-center justify-between">
-        <div className="flex space-x-2 bg-zinc-100 dark:bg-zinc-800/50 p-1 rounded-full border border-zinc-200/10">
-          <button 
-            onClick={cyclePrev} 
-            className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 active:scale-95 bento-transition"
-            title="Previous Skill Deck"
-          >
-            &lt;
-          </button>
-          <button 
-            onClick={cycleNext} 
-            className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 active:scale-95 bento-transition"
-            title="Next Skill Deck"
-          >
-            &gt;
-          </button>
+      {/* Clean Bottom Deck Progress Bar & Counter (Bottom arrows removed) */}
+      <div 
+        onClick={handleDeckShuffle}
+        className="pt-4 border-t border-zinc-100 dark:border-zinc-800/40 flex items-center justify-between cursor-pointer group select-none"
+        title="Click to shuffle deck"
+      >
+        <div className="flex items-center space-x-1.5">
+          {skillCategories.map((_, i) => (
+            <span 
+              key={i}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === activeIndex 
+                  ? 'w-6 bg-brand-orange shadow-[0_0_8px_rgba(255,69,0,0.5)]' 
+                  : 'w-2 bg-zinc-200 dark:bg-zinc-750 group-hover:bg-zinc-300 dark:group-hover:bg-zinc-600'
+              }`}
+            />
+          ))}
         </div>
-        <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
-          DECK {activeIndex + 1}/{skillCategories.length}
+        <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest group-hover:text-brand-orange transition-colors">
+          SHUFFLE ({activeIndex + 1}/{skillCategories.length}) ↻
         </span>
       </div>
     </div>

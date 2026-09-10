@@ -297,6 +297,11 @@ const fallbackData = {
     tag: "HQ",
     fullAddress: "Lovely Professional University, Punjab, India (GMT +5:30)"
   },
+  githubKpi: {
+    repos: 1,
+    followers: 1,
+    streak: 5
+  },
   gallery: [
     {
       id: 1,
@@ -456,6 +461,10 @@ function MainApp() {
               ...fallbackData.location,
               ...(result.data.location || {})
             },
+            githubKpi: {
+              ...fallbackData.githubKpi,
+              ...(result.data.githubKpi || {})
+            },
             certifications: result.data.certifications && result.data.certifications.length > 0 
               ? result.data.certifications 
               : fallbackData.certifications
@@ -589,7 +598,10 @@ function MainApp() {
             <ReadingList books={portfolioData.books} />
 
             {/* GitHub Contributions & Open Source Heatmap */}
-            <GitHubContributions username={portfolioData.hero?.cardGithub || 'srikar-up'} />
+            <GitHubContributions 
+              username={portfolioData.hero?.cardGithub || 'srikar-up'} 
+              kpiData={portfolioData.githubKpi} 
+            />
 
             {/* Curated Writings (Blog) (Full-width horizontal tactile slider) */}
             <Blog blogs={portfolioData.blogs} />

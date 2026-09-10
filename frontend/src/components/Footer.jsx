@@ -74,7 +74,7 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource, loca
         {/* Navigation & Connect Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-xs mb-10">
           <div className="space-y-2.5">
-            <h5 className="text-[10px] font-mono font-bold tracking-widest uppercase text-zinc-400 dark:text-zinc-500">Navigation</h5>
+            <h5 className="text-[10px] font-mono font-bold tracking-widest uppercase text-emerald-600 dark:text-brand-orange">Navigation</h5>
             <ul className="space-y-2 text-zinc-600 dark:text-zinc-300 font-medium">
               <li><a href="#hero" className="hover:text-brand-orange transition-colors">Overview</a></li>
               <li><a href="#projects" className="hover:text-brand-orange transition-colors">Projects</a></li>
@@ -84,7 +84,7 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource, loca
           </div>
 
           <div className="space-y-2.5">
-            <h5 className="text-[10px] font-mono font-bold tracking-widest uppercase text-zinc-400 dark:text-zinc-500">Writing & Work</h5>
+            <h5 className="text-[10px] font-mono font-bold tracking-widest uppercase text-emerald-600 dark:text-brand-orange">Writing & Work</h5>
             <ul className="space-y-2 text-zinc-600 dark:text-zinc-300 font-medium">
               <li><a href="#blog" className="hover:text-brand-orange transition-colors">Notebook & Blogs</a></li>
               <li><a href="#reading-list" className="hover:text-brand-orange transition-colors">Reading Shelf</a></li>
@@ -94,7 +94,7 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource, loca
           </div>
 
           <div className="space-y-2.5">
-            <h5 className="text-[10px] font-mono font-bold tracking-widest uppercase text-zinc-400 dark:text-zinc-500">Social & Code</h5>
+            <h5 className="text-[10px] font-mono font-bold tracking-widest uppercase text-emerald-600 dark:text-brand-orange">Social & Code</h5>
             <ul className="space-y-2 text-zinc-600 dark:text-zinc-300 font-medium">
               <li>
                 <a href="https://github.com/srikar-up" target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors inline-flex items-center space-x-1">
@@ -118,7 +118,7 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource, loca
           </div>
 
           <div className="space-y-2.5">
-            <h5 className="text-[10px] font-mono font-bold tracking-widest uppercase text-zinc-400 dark:text-zinc-500">Direct Contact</h5>
+            <h5 className="text-[10px] font-mono font-bold tracking-widest uppercase text-emerald-600 dark:text-brand-orange">Direct Contact</h5>
             <p className="text-zinc-600 dark:text-zinc-300 text-xs leading-relaxed">
               {loc.fullAddress || 'Lovely Professional University, Punjab, India (GMT +5:30)'}
             </p>

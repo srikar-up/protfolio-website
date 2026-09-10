@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { playTactileClick } from '../utils/sound';
+import { updateGithubKpiInFirebase } from '../firebase';
 
-export default function GitHubContributions({ username = 'srikar-up' }) {
+export default function GitHubContributions({ username = 'srikar-up', kpiData = null }) {
   const [colorTheme, setColorTheme] = useState('green'); // 'green' (GitHub classic) | 'orange' (Solar theme)
   const [hoveredDay, setHoveredDay] = useState(null);
   const [liveContributions, setLiveContributions] = useState(null);
@@ -9,17 +10,55 @@ export default function GitHubContributions({ username = 'srikar-up' }) {
   const [isLoading, setIsLoading] = useState(true);
   const scrollContainerRef = useRef(null);
 
-  // Direct live fetch from GitHub REST API & Contributions endpoint
+  // Daily cache check: fetch from GitHub once every 24 hours, then store/persist in Firebase & localStorage
   useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
 
-    // 1. Fetch live user profile metrics (public_repos, followers, following, created_at, avatar)
+    const now = Date.now();
+    const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 Hours in milliseconds
+    const cacheKey = `gh_cache_${username}`;
+    let cached = null;
+
+    try {
+      const stored = localStorage.getItem(cacheKey);
+      if (stored) {
+        cached = JSON.parse(stored);
+      }
+    } catch (e) {
+      // ignore localStorage errors
+    }
+
+    // If cache is fresh (<24 hours old), use cached data instantly without hitting rate limits
+    if (cached && cached.timestamp && now - cached.timestamp < CACHE_EXPIRY) {
+      if (cached.userProfile) setUserProfile(cached.userProfile);
+      if (cached.contributions) setLiveContributions(cached.contributions);
+      setIsLoading(false);
+      return;
+    }
+
+    // 1. Fetch live user profile metrics
     fetch(`https://api.github.com/users/${username}`)
       .then(res => (res.ok ? res.json() : null))
       .then(data => {
         if (isMounted && data) {
           setUserProfile(data);
+          // Sync fresh metrics to Cloud Firestore once daily
+          updateGithubKpiInFirebase({
+            repos: data.public_repos ?? kpiData?.repos ?? 1,
+            followers: data.followers ?? kpiData?.followers ?? 1,
+            lastSyncedAt: new Date().toISOString()
+          });
+
+          // Save to local cache
+          try {
+            const currentCache = JSON.parse(localStorage.getItem(cacheKey) || '{}');
+            localStorage.setItem(cacheKey, JSON.stringify({
+              ...currentCache,
+              userProfile: data,
+              timestamp: Date.now()
+            }));
+          } catch (e) {}
         }
       })
       .catch(() => {});
@@ -30,6 +69,16 @@ export default function GitHubContributions({ username = 'srikar-up' }) {
       .then(data => {
         if (isMounted && data && data.contributions && Array.isArray(data.contributions)) {
           setLiveContributions(data);
+
+          // Save to local cache
+          try {
+            const currentCache = JSON.parse(localStorage.getItem(cacheKey) || '{}');
+            localStorage.setItem(cacheKey, JSON.stringify({
+              ...currentCache,
+              contributions: data,
+              timestamp: Date.now()
+            }));
+          } catch (e) {}
         }
       })
       .catch(() => {})
@@ -47,12 +96,41 @@ export default function GitHubContributions({ username = 'srikar-up' }) {
     if (liveContributions && liveContributions.contributions) {
       // Parse live data from API
       const days = liveContributions.contributions;
-      const total = liveContributions.total?.lastYear || days.reduce((acc, d) => acc + (d.count || 0), 0);
+      const total = kpiData?.totalContributions || liveContributions.total?.lastYear || days.reduce((acc, d) => acc + (d.count || 0), 0);
       
       const weeksArr = [];
       let currentWeek = [];
       const monthPositions = [];
       let lastMonth = '';
+
+      let tempStreak = 0;
+      let maxStreak = 0;
+      let calculatedCurrentStreak = 0;
+
+      // Scan days for streaks
+      for (let i = 0; i < days.length; i++) {
+        const count = days[i].count || 0;
+        if (count > 0) {
+          tempStreak++;
+          if (tempStreak > maxStreak) maxStreak = tempStreak;
+        } else {
+          tempStreak = 0;
+        }
+      }
+
+      // Check current active streak from end of array backwards
+      for (let i = days.length - 1; i >= 0; i--) {
+        const count = days[i].count || 0;
+        // Allow today (last item) to be 0 without breaking streak if yesterday had commits
+        if (i === days.length - 1 && count === 0) {
+          continue;
+        }
+        if (count > 0) {
+          calculatedCurrentStreak++;
+        } else {
+          break;
+        }
+      }
 
       days.forEach((day, index) => {
         const dateObj = new Date(day.date);
@@ -81,8 +159,8 @@ export default function GitHubContributions({ username = 'srikar-up' }) {
       return {
         weeks: weeksArr,
         totalContributions: total,
-        currentStreak: 14,
-        longestStreak: 36,
+        currentStreak: kpiData?.streak ?? (calculatedCurrentStreak || 5),
+        longestStreak: maxStreak || 12,
         months: monthPositions
       };
     }
@@ -180,12 +258,12 @@ export default function GitHubContributions({ username = 'srikar-up' }) {
 
     return {
       weeks: weeksArr,
-      totalContributions: total,
-      currentStreak: 16,
-      longestStreak: maxStreak,
+      totalContributions: kpiData?.totalContributions || total,
+      currentStreak: kpiData?.streak ?? (currStreak || 5),
+      longestStreak: maxStreak || 12,
       months: monthPositions
     };
-  }, [liveContributions]);
+  }, [liveContributions, kpiData]);
 
   // Color mapping based on theme
   const getCellColor = (level) => {
@@ -208,9 +286,9 @@ export default function GitHubContributions({ username = 'srikar-up' }) {
     }
   };
 
-  // Compute displayed metrics (Prefer live GitHub REST API data)
-  const displayPublicRepos = userProfile?.public_repos ?? 18;
-  const displayFollowers = userProfile?.followers ?? 12;
+  // Compute displayed metrics (Prefer live GitHub REST API data or user's kpiData from Admin panel)
+  const displayPublicRepos = userProfile?.public_repos ?? kpiData?.repos ?? 1;
+  const displayFollowers = userProfile?.followers ?? kpiData?.followers ?? 1;
 
   return (
     <div id="github" className="lg:col-span-12 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 md:p-10 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 bento-transition explode-level-0">

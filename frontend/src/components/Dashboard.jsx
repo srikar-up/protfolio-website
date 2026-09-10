@@ -31,6 +31,8 @@ export default function Dashboard({ data, onSave, onClose }) {
 
   const tabs = [
     { id: 'hero', label: 'Hero Section' },
+    { id: 'location', label: 'Location' },
+    { id: 'github', label: 'GitHub KPI' },
     { id: 'projects', label: 'Projects' },
     { id: 'certifications', label: 'Certifications' },
     { id: 'blogs', label: 'Blogs' },
@@ -113,6 +115,30 @@ export default function Dashboard({ data, onSave, onClose }) {
         updated.hero = {};
       }
       updated.hero[field] = value;
+      return updated;
+    });
+  };
+
+  // Helper to update fields in the Location object
+  const updateLocationField = (field, value) => {
+    setLocalData(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (!updated.location) {
+        updated.location = {};
+      }
+      updated.location[field] = value;
+      return updated;
+    });
+  };
+
+  // Helper to update fields in GitHub KPI stats
+  const updateGithubKpiField = (field, value) => {
+    setLocalData(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (!updated.githubKpi) {
+        updated.githubKpi = {};
+      }
+      updated.githubKpi[field] = value;
       return updated;
     });
   };
@@ -394,7 +420,7 @@ export default function Dashboard({ data, onSave, onClose }) {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Record List</h3>
-              {activeTab !== 'hero' && (
+              {activeTab !== 'hero' && activeTab !== 'location' && activeTab !== 'github' && (
                 <button 
                   onClick={handleAddItem}
                   className="text-[10px] font-mono text-brand-orange font-bold hover:underline"
@@ -410,6 +436,20 @@ export default function Dashboard({ data, onSave, onClose }) {
                   <h4 className="text-xs font-bold text-zinc-850 dark:text-zinc-200">Hero Section</h4>
                   <p className="text-[10px] font-mono text-zinc-400 mt-1 leading-relaxed">
                     Updates the primary greeting, titles, bio, and business card details shown on the homepage.
+                  </p>
+                </div>
+              ) : activeTab === 'location' ? (
+                <div className="p-4 rounded-xl border border-brand-orange/45 bg-brand-orange/5 text-left">
+                  <h4 className="text-xs font-bold text-zinc-850 dark:text-zinc-200">Location & Coordinates</h4>
+                  <p className="text-[10px] font-mono text-zinc-400 mt-1 leading-relaxed">
+                    Configure your headquarters city, state, geographic coordinates, and direct contact address displayed on the interactive Map Card and Footer.
+                  </p>
+                </div>
+              ) : activeTab === 'github' ? (
+                <div className="p-4 rounded-xl border border-brand-orange/45 bg-brand-orange/5 text-left">
+                  <h4 className="text-xs font-bold text-zinc-850 dark:text-zinc-200">GitHub KPI Metrics</h4>
+                  <p className="text-[10px] font-mono text-zinc-400 mt-1 leading-relaxed">
+                    Override or configure your exact Public Repositories count, Followers, and Active Streak displayed on the live telemetry row.
                   </p>
                 </div>
               ) : (
@@ -450,7 +490,7 @@ export default function Dashboard({ data, onSave, onClose }) {
                 </div>
               ))
               )}
-              {activeTab !== 'hero' && activeList.length === 0 && (
+              {activeTab !== 'hero' && activeTab !== 'location' && activeTab !== 'github' && activeList.length === 0 && (
                 <p className="text-xs font-mono text-zinc-400 text-center py-8">No records found. Add one!</p>
               )}
             </div>
@@ -563,6 +603,138 @@ export default function Dashboard({ data, onSave, onClose }) {
                     onChange={(e) => updateHeroField('cardGithub', e.target.value)}
                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
                   />
+                </div>
+              </div>
+            </div>
+          ) : activeTab === 'location' ? (
+            <div className="space-y-6 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <h4 className="text-xs font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-2 border-b pb-1 dark:border-zinc-800/40">Headquarters & Map Card Display</h4>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">State / Region (e.g. Punjab)</label>
+                  <input 
+                    type="text" 
+                    value={localData.location?.state || ''} 
+                    onChange={(e) => updateLocationField('state', e.target.value)}
+                    placeholder="e.g. Punjab"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">Used on map card header & footer credits line.</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">City & Country (e.g. LPU, INDIA)</label>
+                  <input 
+                    type="text" 
+                    value={localData.location?.cityCountry || ''} 
+                    onChange={(e) => updateLocationField('cityCountry', e.target.value)}
+                    placeholder="e.g. LPU, INDIA"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">Shown in the badge on the interactive Map Card.</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Map Tag Badge (e.g. HQ)</label>
+                  <input 
+                    type="text" 
+                    value={localData.location?.tag || ''} 
+                    onChange={(e) => updateLocationField('tag', e.target.value)}
+                    placeholder="HQ"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">Small uppercase badge shown next to state name.</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">GPS Coordinates (Lat / Long)</label>
+                  <input 
+                    type="text" 
+                    value={localData.location?.coordinates || ''} 
+                    onChange={(e) => updateLocationField('coordinates', e.target.value)}
+                    placeholder="31.2536° N, 75.7037° E"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">Coordinates displayed in the bottom telemetry line of Map Card.</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Timezone (e.g. GMT +5:30)</label>
+                  <input 
+                    type="text" 
+                    value={localData.location?.timezone || ''} 
+                    onChange={(e) => updateLocationField('timezone', e.target.value)}
+                    placeholder="GMT +5:30"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Full Contact Address (Shown in Footer Direct Contact)</label>
+                  <input 
+                    type="text" 
+                    value={localData.location?.fullAddress || ''} 
+                    onChange={(e) => updateLocationField('fullAddress', e.target.value)}
+                    placeholder="Lovely Professional University, Punjab, India (GMT +5:30)"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">Appears as the physical location in the Footer Direct Contact column.</p>
+                </div>
+              </div>
+            </div>
+          ) : activeTab === 'github' ? (
+            <div className="space-y-6 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <h4 className="text-xs font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-2 border-b pb-1 dark:border-zinc-800/40">GitHub Telemetry KPI Metrics</h4>
+                  <p className="text-[11px] text-zinc-400 font-mono mb-2">
+                    Controls the 4 KPI cards shown above the GitHub activity heatmap. Set your exact metrics here.
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Public Repositories Count</label>
+                  <input 
+                    type="number" 
+                    value={localData.githubKpi?.repos ?? 1} 
+                    onChange={(e) => updateGithubKpiField('repos', parseInt(e.target.value) || 0)}
+                    placeholder="1"
+                    min="0"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">Displayed in the "Public Repositories" badge card.</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Followers Count</label>
+                  <input 
+                    type="number" 
+                    value={localData.githubKpi?.followers ?? 1} 
+                    onChange={(e) => updateGithubKpiField('followers', parseInt(e.target.value) || 0)}
+                    placeholder="1"
+                    min="0"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">Displayed in the "Followers & Stars" metric card.</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Active Streak (Days)</label>
+                  <input 
+                    type="number" 
+                    value={localData.githubKpi?.streak ?? 5} 
+                    onChange={(e) => updateGithubKpiField('streak', parseInt(e.target.value) || 0)}
+                    placeholder="5"
+                    min="0"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">Displayed in the "Active Streak" 🔥 metric card.</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Total Contributions Override (Optional)</label>
+                  <input 
+                    type="number" 
+                    value={localData.githubKpi?.totalContributions || ''} 
+                    onChange={(e) => updateGithubKpiField('totalContributions', e.target.value ? parseInt(e.target.value) : '')}
+                    placeholder="Leave empty to calculate from chart"
+                    min="0"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">If blank, dynamically sums up all visible commit cells.</p>
                 </div>
               </div>
             </div>
