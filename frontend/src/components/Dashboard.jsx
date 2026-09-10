@@ -32,6 +32,7 @@ export default function Dashboard({ data, onSave, onClose }) {
   const tabs = [
     { id: 'hero', label: 'Hero Section' },
     { id: 'projects', label: 'Projects' },
+    { id: 'certifications', label: 'Certifications' },
     { id: 'blogs', label: 'Blogs' },
     { id: 'timeline', label: 'Timeline' },
     { id: 'books', label: 'Books' },
@@ -137,6 +138,19 @@ export default function Dashboard({ data, onSave, onClose }) {
     });
   };
 
+  const updateCertSkills = (certIndex, skillsString) => {
+    setLocalData(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (!updated.certifications) {
+        updated.certifications = [];
+      }
+      if (updated.certifications[certIndex]) {
+        updated.certifications[certIndex].skills = skillsString.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      return updated;
+    });
+  };
+
   // Add Item Helper using deep copy
   const handleAddItem = () => {
     setLocalData(prev => {
@@ -155,6 +169,23 @@ export default function Dashboard({ data, onSave, onClose }) {
         };
         updated.projects.push(newItem);
         setSelectedItemIndex(updated.projects.length - 1);
+      } else if (activeTab === 'certifications') {
+        newItem = {
+          id: Date.now(),
+          title: 'New Certification Title',
+          issuer: 'Issuing Organization (e.g. Google, AWS, IBM)',
+          platform: 'Coursera / AWS Training / edX',
+          year: new Date().getFullYear().toString(),
+          credentialId: 'CERT-' + Math.floor(10000 + Math.random() * 90000),
+          credentialUrl: 'https://example.com/verify',
+          skills: ['Skill 1', 'Skill 2', 'Skill 3'],
+          desc: 'Description of what this credential covers and core methodologies mastered.'
+        };
+        if (!updated.certifications) {
+          updated.certifications = [];
+        }
+        updated.certifications.push(newItem);
+        setSelectedItemIndex(updated.certifications.length - 1);
       } else if (activeTab === 'blogs') {
         newItem = {
           id: Date.now(),
@@ -237,6 +268,10 @@ export default function Dashboard({ data, onSave, onClose }) {
       
       if (activeTab === 'projects') {
         updated.projects.splice(index, 1);
+      } else if (activeTab === 'certifications') {
+        if (updated.certifications) {
+          updated.certifications.splice(index, 1);
+        }
       } else if (activeTab === 'blogs') {
         updated.blogs.splice(index, 1);
       } else if (activeTab === 'timeline') {
@@ -261,6 +296,7 @@ export default function Dashboard({ data, onSave, onClose }) {
 
   const getActiveList = () => {
     if (activeTab === 'projects') return localData.projects || [];
+    if (activeTab === 'certifications') return localData.certifications || [];
     if (activeTab === 'blogs') return localData.blogs || [];
     if (activeTab === 'timeline') return localData.timeline?.items || [];
     if (activeTab === 'books') return localData.books || [];
@@ -409,7 +445,7 @@ export default function Dashboard({ data, onSave, onClose }) {
                     </button>
                   </div>
                   <p className="text-[10px] font-mono text-zinc-400 mt-1 truncate">
-                    {item.year || item.date || item.subtitle || item.author || "Global Values"}
+                    {item.issuer ? `${item.issuer} • ${item.year || ''}` : (item.year || item.date || item.subtitle || item.author || "Global Values")}
                   </p>
                 </div>
               ))
@@ -617,6 +653,92 @@ export default function Dashboard({ data, onSave, onClose }) {
                         rows="5"
                         value={currentItem.content || ''} 
                         onChange={(e) => updateField('projects', selectedItemIndex, 'content', e.target.value)}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition resize-none"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* 1.5. Certifications Fields */}
+                {activeTab === 'certifications' && (
+                  <>
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Certification Program Title</label>
+                      <input 
+                        type="text" 
+                        value={currentItem.title || ''} 
+                        onChange={(e) => updateField('certifications', selectedItemIndex, 'title', e.target.value)}
+                        placeholder="e.g. Deep Learning Specialization"
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Issuing Organization</label>
+                      <input 
+                        type="text" 
+                        value={currentItem.issuer || ''} 
+                        onChange={(e) => updateField('certifications', selectedItemIndex, 'issuer', e.target.value)}
+                        placeholder="e.g. DeepLearning.AI, IBM, Google, Meta"
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Host Platform / Authority</label>
+                      <input 
+                        type="text" 
+                        value={currentItem.platform || ''} 
+                        onChange={(e) => updateField('certifications', selectedItemIndex, 'platform', e.target.value)}
+                        placeholder="e.g. Coursera, AWS Training, edX"
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Year of Completion</label>
+                      <input 
+                        type="text" 
+                        value={currentItem.year || ''} 
+                        onChange={(e) => updateField('certifications', selectedItemIndex, 'year', e.target.value)}
+                        placeholder="e.g. 2026"
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Credential ID</label>
+                      <input 
+                        type="text" 
+                        value={currentItem.credentialId || ''} 
+                        onChange={(e) => updateField('certifications', selectedItemIndex, 'credentialId', e.target.value)}
+                        placeholder="e.g. DLAI-NN-40912"
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition font-mono"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Verification URL (credentialUrl)</label>
+                      <input 
+                        type="text" 
+                        value={currentItem.credentialUrl || ''} 
+                        onChange={(e) => updateField('certifications', selectedItemIndex, 'credentialUrl', e.target.value)}
+                        placeholder="https://coursera.org/verify/..."
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition font-mono"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Covered Skills & Competencies (comma separated)</label>
+                      <input 
+                        type="text" 
+                        value={currentItem.skills ? (Array.isArray(currentItem.skills) ? currentItem.skills.join(', ') : currentItem.skills) : ''} 
+                        onChange={(e) => updateCertSkills(selectedItemIndex, e.target.value)}
+                        placeholder="e.g. Neural Networks, TensorFlow, Hyperparameter Tuning"
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition font-mono"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Detailed Summary & Overview</label>
+                      <textarea 
+                        rows="4"
+                        value={currentItem.desc || ''} 
+                        onChange={(e) => updateField('certifications', selectedItemIndex, 'desc', e.target.value)}
+                        placeholder="Describe the curriculum, technical problems solved, and specialized concepts mastered."
                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition resize-none"
                       />
                     </div>

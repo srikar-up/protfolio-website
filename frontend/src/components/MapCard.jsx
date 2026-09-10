@@ -1,6 +1,13 @@
 import React from 'react';
 
-export default function MapCard() {
+export default function MapCard({ data }) {
+  const loc = data || {
+    state: "Punjab",
+    cityCountry: "LPU, INDIA",
+    coordinates: "31.2536° N, 75.7037° E",
+    tag: "HQ"
+  };
+
   return (
     <div id="location" className="lg:col-span-4 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 min-h-[460px] flex flex-col justify-between bento-transition explode-level-1 overflow-hidden relative">
       {/* Background map grid coordinate overlay */}
@@ -26,14 +33,14 @@ export default function MapCard() {
       <div className="relative z-10">
         <div className="flex justify-between items-center">
           <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Map location</span>
-          <span className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full text-zinc-400 dark:text-zinc-500">HQ</span>
+          <span className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full text-zinc-400 dark:text-zinc-500">{loc.tag || 'HQ'}</span>
         </div>
       </div>
 
       <div className="relative z-10 text-center pb-2">
-        <h3 className="font-syne font-bold text-2xl tracking-tight text-zinc-950 dark:text-white uppercase">Punjab</h3>
-        <p className="text-xs font-mono text-zinc-400 dark:text-zinc-500 mt-1">LPU, INDIA</p>
-        <p className="text-[9px] font-mono text-zinc-300 dark:text-zinc-600 mt-2 tracking-widest">31.2536° N, 75.7037° E</p>
+        <h3 className="font-syne font-bold text-2xl tracking-tight text-zinc-950 dark:text-white uppercase">{loc.state || 'Punjab'}</h3>
+        <p className="text-xs font-mono text-zinc-400 dark:text-zinc-500 mt-1">{loc.cityCountry || 'LPU, INDIA'}</p>
+        <p className="text-[9px] font-mono text-zinc-300 dark:text-zinc-600 mt-2 tracking-widest">{loc.coordinates || '31.2536° N, 75.7037° E'}</p>
       </div>
     </div>
   );

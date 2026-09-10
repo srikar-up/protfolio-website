@@ -19,8 +19,8 @@ import StickyOutline from './components/StickyOutline';
 import Certifications from './components/Certifications';
 import GitHubContributions from './components/GitHubContributions';
 import { fetchPortfolioFromFirebase, savePortfolioToFirebase, isFirebaseConfigured } from './firebase';
-import heroLightImg from './assets/herolight.png';
-import heroDarkImg from './assets/herodark.png';
+import heroLightImg from './assets/herolight.webp';
+import heroDarkImg from './assets/herodark.webp';
 
 
 const fallbackData = {
@@ -289,6 +289,14 @@ const fallbackData = {
     cardLinkedin: "srikar-maddela",
     cardGithub: "srikar-up"
   },
+  location: {
+    state: "Punjab",
+    cityCountry: "LPU, INDIA",
+    coordinates: "31.2536° N, 75.7037° E",
+    timezone: "GMT +5:30",
+    tag: "HQ",
+    fullAddress: "Lovely Professional University, Punjab, India (GMT +5:30)"
+  },
   gallery: [
     {
       id: 1,
@@ -440,7 +448,18 @@ function MainApp() {
       if (isFirebaseConfigured()) {
         const result = await fetchPortfolioFromFirebase();
         if (result && result.data) {
-          setPortfolioData(result.data);
+          // Deep merge with fallbackData so newly introduced fields (like certifications & location) remain intact
+          setPortfolioData(prev => ({
+            ...fallbackData,
+            ...result.data,
+            location: {
+              ...fallbackData.location,
+              ...(result.data.location || {})
+            },
+            certifications: result.data.certifications && result.data.certifications.length > 0 
+              ? result.data.certifications 
+              : fallbackData.certifications
+          }));
           setDataSource('Cloud Firestore');
           console.log('%c[FIREBASE STATUS] Connected & Loaded live from Cloud Firestore', 'color: #10b981; font-weight: bold;');
           return;
@@ -576,7 +595,7 @@ function MainApp() {
             <Blog blogs={portfolioData.blogs} />
 
             {/* Location Map & How I Work (Placed directly above Contact) */}
-            <MapCard />
+            <MapCard data={portfolioData.location} />
             <Process />
 
             {/* Contact / Get in Touch */}
@@ -592,6 +611,7 @@ function MainApp() {
           onToggleDashboard={() => navigateTo('/dashboard')} 
           navigateTo={navigateTo}
           dataSource={dataSource} 
+          locationData={portfolioData.location}
         />
       )}
 
