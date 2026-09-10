@@ -15,7 +15,12 @@ import Dashboard from './components/Dashboard';
 import CV from './components/CV';
 import Gallery from './components/Gallery';
 import BlogsPage from './components/BlogsPage';
+import StickyOutline from './components/StickyOutline';
+import Certifications from './components/Certifications';
+import GitHubContributions from './components/GitHubContributions';
 import { fetchPortfolioFromFirebase, savePortfolioToFirebase, isFirebaseConfigured } from './firebase';
+import heroLightImg from './assets/herolight.png';
+import heroDarkImg from './assets/herodark.png';
 
 
 const fallbackData = {
@@ -214,6 +219,63 @@ const fallbackData = {
       bgColor: "from-violet-500 to-purple-600",
       textGrad: "text-violet-500",
       pills: ["Pandas", "NumPy", "Scikit-Learn", "TensorFlow", "Matplotlib", "SQL", "Data Visualization"]
+    }
+  ],
+  certifications: [
+    {
+      id: 1,
+      title: "Deep Learning Specialization",
+      issuer: "DeepLearning.AI",
+      platform: "Coursera",
+      year: "2026",
+      credentialId: "DLAI-NN-40912",
+      credentialUrl: "https://coursera.org/verify/specialization/DLAI",
+      skills: ["Neural Networks", "TensorFlow", "CNNs", "Transformers", "Hyperparameter Tuning"],
+      desc: "Mastering foundational deep learning architectures, convolutional neural networks for computer vision, and sequence models using TensorFlow."
+    },
+    {
+      id: 2,
+      title: "IBM Data Science Professional",
+      issuer: "IBM",
+      platform: "Coursera",
+      year: "2025",
+      credentialId: "IBM-DS-98214",
+      credentialUrl: "https://coursera.org/verify/professional-cert/IBM-DS",
+      skills: ["Python", "SQL", "Data Analysis", "Machine Learning", "Data Visualization"],
+      desc: "Comprehensive 10-course professional curriculum covering statistical modeling, Python data pipelines, machine learning algorithms, and database querying."
+    },
+    {
+      id: 3,
+      title: "Google Advanced Data Analytics",
+      issuer: "Google",
+      platform: "Google Career Certificates",
+      year: "2025",
+      credentialId: "GOOG-ADA-8711",
+      credentialUrl: "https://coursera.org/verify/professional-cert/GOOGLE-ADA",
+      skills: ["Predictive Modeling", "Statistics", "EDA", "Python", "Tableau"],
+      desc: "End-to-end data analytics lifecycle, exploratory data analysis, hypothesis testing, and production regression modeling."
+    },
+    {
+      id: 4,
+      title: "Meta Front-End Developer Professional",
+      issuer: "Meta",
+      platform: "Coursera",
+      year: "2025",
+      credentialId: "META-FED-3329",
+      credentialUrl: "https://coursera.org/verify/professional-cert/META-FED",
+      skills: ["React.js", "Modern JavaScript", "UI/UX Design", "CSS Architecture"],
+      desc: "Core frontend systems architecture, component lifecycle optimization, accessible UI development, and responsive bento layouts."
+    },
+    {
+      id: 5,
+      title: "AWS Machine Learning Foundations",
+      issuer: "Amazon Web Services",
+      platform: "AWS Training",
+      year: "2026",
+      credentialId: "AWS-MLS-6610",
+      credentialUrl: "https://aws.amazon.com/verification",
+      skills: ["AWS SageMaker", "Cloud ML Pipelines", "Model Deployment", "Feature Stores"],
+      desc: "Architecting and deploying production-grade machine learning workflows, automated ETL pipelines, and feature stores on AWS cloud infrastructure."
     }
   ],
   hero: {
@@ -436,10 +498,35 @@ function MainApp() {
   const isBlogs = currentPath === '/blogs';
 
   return (
-    <div className="bg-brand-lightBg dark:bg-brand-darkBg text-zinc-800 dark:text-zinc-200 font-sans antialiased transition-colors duration-500 selection:bg-orange-500/10 overflow-x-clip min-h-screen">
+    <div className="relative bg-brand-lightBg dark:bg-brand-darkBg text-zinc-800 dark:text-zinc-200 font-sans antialiased transition-colors duration-500 selection:bg-orange-500/10 overflow-x-clip min-h-screen">
       
+      {/* Full-Screen Hero Background covering entire viewport width and height (including outline and header) */}
+      {!isDashboard && !isCV && !isGallery && !isBlogs && (
+        <div className="absolute top-0 left-0 right-0 h-[100vh] min-h-[750px] max-h-[1100px] z-0 pointer-events-none overflow-hidden select-none">
+          {/* Light Mode Hero Background Image */}
+          <img 
+            src={heroLightImg} 
+            alt="Hero Screen Light"
+            className="w-full h-full object-cover object-top dark:hidden transition-opacity duration-700 opacity-90"
+          />
+          {/* Dark Mode Hero Background Image */}
+          <img 
+            src={heroDarkImg} 
+            alt="Hero Screen Dark"
+            className="w-full h-full object-cover object-top hidden dark:block transition-opacity duration-700 opacity-85"
+          />
+
+          {/* Seamless gradient fade at the bottom into the page canvas */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-brand-lightBg dark:to-brand-darkBg" />
+          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent to-brand-lightBg dark:to-brand-darkBg" />
+        </div>
+      )}
+
       {/* Site Header Controls - Only show on home or CV page */}
       {!isDashboard && <Header navigateTo={navigateTo} isCV={isCV || isGallery || isBlogs} />}
+
+      {/* Sticky Table of Contents / Outline Dock (Desktop Left Gutter) */}
+      {!isDashboard && !isCV && !isGallery && !isBlogs && <StickyOutline />}
 
       {/* Main Layout Container */}
       <main className="relative z-10 max-w-6xl mx-auto px-6 pt-32 pb-24 md:px-12">
@@ -470,25 +557,26 @@ function MainApp() {
             {/* Hero Block (Transparent, occupies full screen width/height) */}
             <Hero data={portfolioData.hero} navigateTo={navigateTo} />
 
-            {/* Projects Showcase (with scroll scatter-assemble effect) */}
+            {/* Projects Showcase (Full-width horizontal tactile slider) */}
             <Projects items={portfolioData.projects} onToggleCv={handleToggleCvProject} />
 
-            {/* Card 1: Experience */}
+            {/* Certifications Showcase (Full-width horizontal tactile slider, like blogs & projects) */}
+            <Certifications items={portfolioData.certifications} />
+
+            {/* Bento Grid: Core Profile & Background */}
+            {/* Experience, Skills, My Reads */}
             <About timeline={portfolioData.timeline} />
-
-            {/* Card 2: Skills Set */}
             <SkillsCard skills={portfolioData.skills} />
-
-            {/* Card 3: Reading List */}
             <ReadingList books={portfolioData.books} />
 
-            {/* Blog writings section (Carousel slider + Modal popups) */}
+            {/* GitHub Contributions & Open Source Heatmap */}
+            <GitHubContributions username={portfolioData.hero?.cardGithub || 'srikar-up'} />
+
+            {/* Curated Writings (Blog) (Full-width horizontal tactile slider) */}
             <Blog blogs={portfolioData.blogs} />
 
-            {/* Card 4: Location Map */}
+            {/* Location Map & How I Work (Placed directly above Contact) */}
             <MapCard />
-
-            {/* Card 5: How I Work */}
             <Process />
 
             {/* Contact / Get in Touch */}

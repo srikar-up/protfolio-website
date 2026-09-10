@@ -41,6 +41,15 @@ body {
   border-radius: 3px;
 }
 
+/* Hide scrollbar for clean touch/trackpad carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Fluid Layout Transitions */
 .bento-transition {
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);

@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { handleEmailClick } from '../utils/email';
+import heroLightImg from '../assets/herolight.png';
+import heroDarkImg from '../assets/herodark.png';
 
 export default function Hero({ data, navigateTo }) {
   const heroData = data || {
@@ -16,6 +19,18 @@ export default function Hero({ data, navigateTo }) {
   };
   const { showToast } = useTheme();
   const [isFlipped, setIsFlipped] = useState(false);
+  const userInteractedRef = useRef(false);
+
+  // Automatically flip the card after 1.5 - 2 seconds so visitors discover it's interactive
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!userInteractedRef.current) {
+        setIsFlipped(true);
+      }
+    }, 1800);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleDownloadCV = () => {
     showToast("Opening Srikar's Web CV...");
@@ -35,12 +50,13 @@ export default function Hero({ data, navigateTo }) {
   };
 
   const handleCardFlip = () => {
+    userInteractedRef.current = true;
     setIsFlipped(prev => !prev);
     showToast(isFlipped ? "Flipped to Business Card" : "Viewing business_card.json");
   };
 
   return (
-    <section className="lg:col-span-12 w-full flex flex-col items-center justify-between min-h-[92vh] py-8 lg:py-12 relative overflow-hidden select-none">
+    <section id="hero" className="lg:col-span-12 w-full flex flex-col items-center justify-between min-h-[92vh] py-8 lg:py-12 relative select-none">
       
       {/* Main Narrative & Card split container */}
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10 my-auto pt-6">
@@ -52,13 +68,12 @@ export default function Hero({ data, navigateTo }) {
             <span id="badge-status-text">AVAILABLE FOR ROLES & INNOVATIVE PROJECTS</span>
           </div>
 
-          <h1 className="font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.15] text-zinc-900 dark:text-white mb-6">
-            Hi, I’m {heroData.name}!
+          <h1 className="font-sans font-extrabold text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-[1.15] text-zinc-900 dark:text-white mb-6">
+            {heroData.name}
             <br />
-            <span className="font-normal text-zinc-400 dark:text-zinc-500">I’m a </span>
-            <span className="font-extrabold text-zinc-800 dark:text-zinc-200">{heroData.title}</span>
+            <span className="font-extrabold text-zinc-800 dark:text-zinc-200 text-2xl sm:text-3xl lg:text-4xl">{heroData.title}</span>
             <br />
-            <span id="accent-text" className="text-brand-orange font-extrabold transition-colors duration-500">{heroData.subtitle}</span>
+            <span id="accent-text" className="text-brand-orange font-extrabold text-2xl sm:text-3xl lg:text-4xl transition-colors duration-500">{heroData.subtitle}</span>
           </h1>
 
           <p className="max-w-xl text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed mb-8">
@@ -159,7 +174,14 @@ export default function Hero({ data, navigateTo }) {
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">4</span>
-                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"email"</span>: <a href="mailto:srikarsensai@gmail.com" onClick={(e) => e.stopPropagation()} className="text-emerald-600 dark:text-emerald-400 hover:underline">"srikarsensai@gmail.com"</a>,</span>
+                    <span>  <span className="text-orange-500 dark:text-orange-400 font-medium">"email"</span>: <a 
+                      href="mailto:srikarsensai@gmail.com" 
+                      onClick={(e) => {
+                        handleEmailClick(e, 'srikarsensai@gmail.com', 'Message for Srikar Maddela');
+                        showToast('Opening email client / webmail...');
+                      }} 
+                      className="text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+                    >"srikarsensai@gmail.com"</a>,</span>
                   </div>
                   <div className="flex">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none w-5 text-right pr-2">5</span>

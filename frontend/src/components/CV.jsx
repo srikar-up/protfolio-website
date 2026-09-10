@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { handleEmailClick } from '../utils/email';
 
 export default function CV({ data, onClose }) {
   const { theme, accent } = useTheme();
@@ -272,7 +273,7 @@ export default function CV({ data, onClose }) {
             {heroData.cardCourse} | {heroData.title}
           </p>
           <div className="contact-info-bar flex flex-wrap justify-center sm:justify-start items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm text-zinc-700 font-mono">
-            <span>Email: {heroData.cardEmail}</span>
+            <span>Email: <a href={`mailto:${heroData.cardEmail}`} onClick={(e) => handleEmailClick(e, heroData.cardEmail, 'Inquiry for Srikar')} className="underline cursor-pointer">{heroData.cardEmail}</a></span>
             <span>•</span>
             <span>Location: Punjab, India</span>
             <span>•</span>
@@ -381,7 +382,10 @@ export default function CV({ data, onClose }) {
             {/* Email Contact */}
             <a 
               href={`mailto:${heroData.cardEmail}`}
-              className="flex items-center space-x-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/40 dark:border-zinc-800/40 hover:scale-[1.03] active:scale-[0.97] bento-transition"
+              onClick={(e) => {
+                handleEmailClick(e, heroData.cardEmail, 'CV Inquiry for Srikar Maddela');
+              }}
+              className="flex items-center space-x-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/40 dark:border-zinc-800/40 hover:scale-[1.03] active:scale-[0.97] bento-transition cursor-pointer"
             >
               <div className="p-2 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/40 dark:border-zinc-800/40 text-zinc-600 dark:text-zinc-400">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

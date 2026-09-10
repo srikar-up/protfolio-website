@@ -21,10 +21,10 @@ export default function About({ timeline = { items: [], footerText: '' } }) {
   };
 
   return (
-    <div className="lg:col-span-4 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 min-h-[420px] flex flex-col justify-between bento-transition explode-level-1">
+    <div id="education" className="lg:col-span-4 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 min-h-[420px] flex flex-col justify-between bento-transition explode-level-1">
       <div>
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500">My Education</h2>
+          <h2 className="text-xs font-mono uppercase tracking-widest text-brand-orange font-bold">My Education</h2>
           <div className="flex space-x-1.5 bg-zinc-100 dark:bg-zinc-800/50 p-1 rounded-full border border-zinc-200/10">
             <button 
               onClick={() => scrollTimeline('up')}

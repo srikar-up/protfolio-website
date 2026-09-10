@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { saveContactMessageToFirebase, isFirebaseConfigured } from '../firebase';
+import { handleEmailClick } from '../utils/email';
 
 export default function Contact() {
   const { showToast } = useTheme();
@@ -25,77 +26,32 @@ export default function Contact() {
     }
 
     const trimmedName = formData.name.trim().slice(0, 100);
-    const trimmedEmail = formData.email.trim().slice(0, 100);
-    const trimmedMessage = formData.message.trim().slice(0, 2000);
+    const trimmedMessage = formData.message.trim().slice(0, 3000);
 
     // 2. Input presence check
-    if (!trimmedName || !trimmedEmail || !trimmedMessage) {
+    if (!trimmedName || !trimmedMessage) {
       setStatus('error');
-      setStatusMsg('Please fill in all fields.');
-      showToast('Please fill in all fields.');
+      setStatusMsg('Please enter your name and message.');
+      showToast('Please enter your name and message.');
       return;
     }
 
-    // 3. Email format regex validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmedEmail)) {
-      setStatus('error');
-      setStatusMsg('Please enter a valid email address.');
-      showToast('Invalid email address.');
-      return;
-    }
+    const emailSubject = `Inquiry from ${trimmedName} (Portfolio Contact)`;
+    const emailBody = `Hi Srikar,\n\n${trimmedMessage}\n\nBest regards,\n${trimmedName}`;
 
-    // 4. Rate limiting: 20-second cooldown per session
-    const now = Date.now();
-    if (now - lastSubmittedAt < 20000) {
-      const waitSecs = Math.ceil((20000 - (now - lastSubmittedAt)) / 1000);
-      setStatus('error');
-      setStatusMsg(`Please wait ${waitSecs}s before sending another inquiry.`);
-      showToast(`Rate limit: wait ${waitSecs}s.`);
-      return;
-    }
+    // Launch email compose immediately
+    handleEmailClick(e, 'srikarsensai@gmail.com', emailSubject, emailBody);
+    showToast('Redirecting to email compose...');
+    setStatus('success');
+    setStatusMsg(`Opening email compose for ${trimmedName}...`);
 
-    const sanitizedData = {
-      name: trimmedName,
-      email: trimmedEmail,
-      message: trimmedMessage
-    };
-
-    setStatus('sending');
-
-    // 5. Send to Firebase Firestore if configured
+    // Optionally backup copy to Firebase in the background
     if (isFirebaseConfigured()) {
-      const success = await saveContactMessageToFirebase(sanitizedData);
-      if (success) {
-        setStatus('success');
-        setLastSubmittedAt(Date.now());
-        setStatusMsg(`Thank you, ${trimmedName}! Your message has been sent successfully.`);
-        showToast(`Thank you, ${trimmedName}! Message sent.`);
-        setFormData({ name: '', email: '', message: '', honeypot: '' });
-        return;
-      }
-    }
-
-    // 6. Fallback to local Express API if server is running
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sanitizedData),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Submission failed');
-
-      setStatus('success');
-      setLastSubmittedAt(Date.now());
-      setStatusMsg(data.message || 'Message sent successfully!');
-      showToast(`Thank you, ${trimmedName}! Message sent.`);
-      setFormData({ name: '', email: '', message: '', honeypot: '' });
-    } catch (err) {
-      setStatus('error');
-      setStatusMsg(err.message || 'Something went wrong. Please try again.');
-      showToast('Submission failed.');
+      saveContactMessageToFirebase({
+        name: trimmedName,
+        email: 'via-email-compose@direct.mail',
+        message: trimmedMessage
+      }).catch(err => console.warn('Backup write note:', err));
     }
   };
 
@@ -111,8 +67,17 @@ export default function Contact() {
               <span>GET IN TOUCH</span>
             </div>
             
-            <h2 className="font-syne font-bold text-3xl md:text-4xl text-zinc-900 dark:text-white leading-tight mb-6">
-              Let's create something<br />exceptional.
+            <h2 
+              onClick={(e) => {
+                handleEmailClick(e, 'srikarsensai@gmail.com', 'Let\'s create something exceptional');
+                showToast('Opening email composer...');
+              }}
+              className="font-syne font-bold text-3xl md:text-4xl text-zinc-900 dark:text-white leading-tight mb-6 cursor-pointer group hover:text-brand-orange transition-colors"
+              title="Click to send an email"
+            >
+              Let's create something<br />
+              <span className="group-hover:underline underline-offset-8">exceptional.</span>
+              <span className="inline-block ml-3 text-base text-brand-orange opacity-0 group-hover:opacity-100 transition-opacity">✉ ↗</span>
             </h2>
             
             <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-sm">
@@ -121,10 +86,6 @@ export default function Contact() {
           </div>
 
           <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800/40 text-xs font-mono text-zinc-400 dark:text-zinc-500 space-y-2">
-            <div className="flex justify-between max-w-xs">
-              <span>EMAIL:</span>
-              <a href="mailto:srikarsensai@gmail.com" className="text-zinc-800 dark:text-zinc-200 hover:text-brand-orange bento-transition">srikarsensai@gmail.com</a>
-            </div>
             <div className="flex justify-between max-w-xs">
               <span>LOCATION:</span>
               <span className="text-zinc-800 dark:text-zinc-200">Punjab, India</span>
@@ -158,22 +119,8 @@ export default function Contact() {
                 id="name"
                 name="name"
                 value={formData.name}
-                onChange={handleChange}
+                onChange={handleChange} 
                 placeholder="John Doe" 
-                className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-100 outline-none bento-transition"
-                disabled={status === 'sending'}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Your Email</label>
-              <input 
-                type="email" 
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="john@example.com" 
                 className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-100 outline-none bento-transition"
                 disabled={status === 'sending'}
               />
@@ -185,10 +132,10 @@ export default function Contact() {
                 id="message"
                 name="message"
                 value={formData.message}
-                onChange={handleChange}
+                onChange={handleChange} 
                 placeholder="Hi Srikar, I have a project idea..." 
                 className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-100 outline-none resize-none bento-transition"
-                rows="4"
+                rows="5"
                 disabled={status === 'sending'}
               ></textarea>
             </div>
@@ -208,7 +155,7 @@ export default function Contact() {
               className="w-full py-4 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-900 dark:hover:bg-zinc-100 rounded-full font-semibold text-xs shadow-md hover:scale-[1.02] active:scale-95 bento-transition flex items-center justify-center space-x-2"
               disabled={status === 'sending'}
             >
-              <span>{status === 'sending' ? 'TRANSMITTING...' : 'SEND INQUIRY'}</span>
+              <span>{status === 'sending' ? 'REDIRECTING TO EMAIL...' : 'COMPOSE IN EMAIL ↗'}</span>
             </button>
           </form>
         </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { handleEmailClick } from '../utils/email';
 
 export default function Footer({ onToggleDashboard, navigateTo, dataSource }) {
   const { showToast } = useTheme();
@@ -30,7 +31,7 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource }) {
   };
 
   return (
-    <footer className="relative z-30 border-t border-zinc-200/10 dark:border-zinc-800/10 bg-white dark:bg-zinc-950 py-16 px-6 md:px-12 text-zinc-400 dark:text-zinc-500 text-xs font-mono mt-16 w-full">
+    <footer id="site-footer" className="relative z-30 border-t border-zinc-200/10 dark:border-zinc-800/10 bg-white dark:bg-zinc-950 py-16 px-6 md:px-12 text-zinc-400 dark:text-zinc-500 text-xs font-mono mt-16 w-full">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-12">
         
         {/* Left Column: Branding and Email contact */}
@@ -45,7 +46,16 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource }) {
             Fusing physical depth with tactile layouts. Building high-performance visual frameworks that load instantly and respond to human interaction.
           </p>
           <div className="text-zinc-955 dark:text-white font-semibold font-mono text-xs">
-            <a href="mailto:srikarsensai@gmail.com" className="hover:text-brand-orange bento-transition">srikarsensai@gmail.com</a>
+            <a 
+              href="mailto:srikarsensai@gmail.com" 
+              onClick={(e) => {
+                handleEmailClick(e, 'srikarsensai@gmail.com', 'Connecting with Srikar Maddela');
+                showToast('Opening email client / webmail...');
+              }}
+              className="hover:text-brand-orange bento-transition cursor-pointer"
+            >
+              srikarsensai@gmail.com
+            </a>
           </div>
         </div>
 

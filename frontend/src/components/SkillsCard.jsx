@@ -68,7 +68,7 @@ export default function SkillsCard({ skills = [] }) {
   return (
     <div id="skills-card" className="lg:col-span-4 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 min-h-[420px] flex flex-col justify-between bento-transition explode-level-1">
       <div>
-        <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-6">My Skills Set</h2>
+        <h2 className="text-xs font-mono uppercase tracking-widest text-brand-orange font-bold mb-6">My Skills Set</h2>
         
         {/* Stack of Cards (Representing skill categories) */}
         <div className="relative h-44 w-full flex items-center justify-center overflow-visible mb-6">

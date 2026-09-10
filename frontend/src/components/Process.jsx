@@ -34,7 +34,7 @@ export default function Process() {
   const currentStep = steps.find(s => s.id === activeStep) || steps[0];
 
   return (
-    <div className="lg:col-span-8 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 md:p-10 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 min-h-[460px] flex flex-col justify-between bento-transition explode-level-1">
+    <div id="process" className="lg:col-span-8 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 md:p-10 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 min-h-[460px] flex flex-col justify-between bento-transition explode-level-1">
       <div>
         <div className="flex justify-between items-center mb-6">
           <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500">How I work</span>
