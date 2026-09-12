@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Secure LeetSync Pro</title>
+<style>
+  :root {
+    --bg-page: #0d1117;
+    --tile-bg: #161b22;
+    --tile-border: #30363d;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent-green: #2ea043;
+    --accent-green-bright: #3fb950;
+    --accent-blue: #58a6ff;
+    --accent-amber: #d29922;
+    --accent-red: #f85149;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    width: 380px;
+    background: var(--bg-page);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--text-primary);
+  }
+
+  .bento-wrap {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .tile {
+    background: var(--tile-bg);
+    border: 1px solid var(--tile-border);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+
+  /* ---------- TILE 1: Setup Guide ---------- */
+  .setup-tile { position: relative; overflow: hidden; }
+
+  .setup-header { display: flex; align-items: center; gap: 10px; cursor: default; }
+
+  .radar { position: relative; width: 20px; height: 20px; flex-shrink: 0; }
+
+  .radar-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent-blue);
+    position: absolute; top: 5px; left: 5px; z-index: 2;
+  }
+
+  .radar-pulse {
+    position: absolute; top: 0; left: 0; width: 20px; height: 20px;
+    border-radius: 50%; background: var(--accent-blue); opacity: 0.55;
+    animation: pulse-glow 1.8s ease-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0% { transform: scale(0.4); opacity: 0.55; }
+    70% { transform: scale(2.1); opacity: 0; }
+    100% { transform: scale(2.1); opacity: 0; }
+  }
+
+  .setup-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .setup-sub { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+  .tutorial-panel {
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.3s ease, margin-top 0.35s ease;
+    margin-top: 0;
+  }
+
+  .setup-tile:hover .tutorial-panel,
+  .setup-tile:focus-within .tutorial-panel {
+    max-height: 340px; opacity: 1; margin-top: 12px;
+  }
+
+  .tutorial-panel ol {
+    margin: 0; padding-left: 18px; font-size: 11.5px;
+    line-height: 1.55; color: var(--text-secondary);
+  }
+
+  .tutorial-panel li { margin-bottom: 6px; }
+  .tutorial-panel b { color: var(--text-primary); }
+
+  .tutorial-panel .note {
+    font-size: 11px; color: var(--text-secondary); margin-top: 6px;
+    padding-top: 8px; border-top: 1px solid var(--tile-border);
+  }
+
+  .gh-link {
+    display: inline-block; margin-top: 4px; font-size: 11.5px; font-weight: 600;
+    color: var(--accent-blue); text-decoration: none;
+    border: 1px solid var(--tile-border); padding: 5px 10px; border-radius: 8px;
+  }
+
+  .gh-link:hover { border-color: var(--accent-blue); }
+
+  /* ---------- TILE 2: Config Fields ---------- */
+  .config-tile { display: grid; gap: 10px; }
+  .field-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .field-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.2px;
+    color: var(--text-secondary); text-transform: uppercase;
+  }
+
+  .field-input {
+    background: #0d1117; border: 1px solid var(--tile-border); border-radius: 10px;
+    padding: 9px 10px; font-size: 12.5px; color: var(--text-primary);
+    outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-family: inherit;
+  }
+
+  .field-input::placeholder { color: #565d66; }
+
+  .field-input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+  }
+
+  .field-hint { font-size: 10px; color: var(--text-secondary); }
+
+  .save-row { display: flex; justify-content: flex-end; }
+
+  .save-btn {
+    background: transparent; border: 1px solid var(--tile-border);
+    color: var(--text-secondary); font-size: 11px; font-weight: 600;
+    padding: 6px 12px; border-radius: 8px; cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .save-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+  /* ---------- TILE 3: Run Trigger ---------- */
+  .run-tile { display: grid; gap: 12px; }
+
+  .run-btn {
+    background: var(--accent-green); color: #ffffff; border: none; border-radius: 12px;
+    padding: 13px 16px; font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: background 0.2s ease, transform 0.08s ease; letter-spacing: 0.2px;
+  }
+
+  .run-btn:hover { background: var(--accent-green-bright); }
+  .run-btn:active { transform: scale(0.98); }
+
+  .run-btn:disabled { background: #234d2f; color: #7b8a80; cursor: not-allowed; }
+
+  .status-banner {
+    display: none; border-radius: 10px; padding: 10px 12px;
+    font-size: 12px; font-weight: 600; line-height: 1.4; border: 1px solid transparent;
+  }
+
+  .status-banner.visible { display: block; }
+
+  .status-banner.status-working {
+    background: rgba(88, 166, 255, 0.10);
+    border-color: rgba(210, 153, 34, 0.4);
+    color: var(--accent-amber);
+  }
+
+  .status-banner.status-success {
+    background: rgba(46, 160, 67, 0.12);
+    border-color: rgba(46, 160, 67, 0.45);
+    color: var(--accent-green-bright);
+  }
+
+  .status-banner.status-error {
+    background: rgba(248, 81, 73, 0.10);
+    border-color: rgba(248, 81, 73, 0.45);
+    color: var(--accent-red);
+  }
+
+  .hint { font-size: 10.5px; color: var(--text-secondary); text-align: center; }
+</style>
+</head>
+<body>
+  <div class="bento-wrap">
+
+    <!-- TILE 1: Setup Guide -->
+    <div class="tile setup-tile" tabindex="0">
+      <div class="setup-header">
+        <div class="radar">
+          <div class="radar-pulse"></div>
+          <div class="radar-dot"></div>
+        </div>
+        <div>
+          <div class="setup-title">Step 1 · First-time setup</div>
+          <div class="setup-sub">Hover for the quick token guide</div>
+        </div>
+      </div>
+      <div class="tutorial-panel">
+        <ol>
+          <li><b>Go to</b> GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens.</li>
+          <li><b>Choose</b> "Only select repositories" and pick your LeetCode-sync repo.</li>
+          <li><b>Grant</b> "Read and write" for <b>Secrets</b> and "Read and write" for <b>Actions</b> — this lets the token update your session secrets and trigger the workflow.</li>
+        </ol>
+        <div class="note">Your repo's "Sync LeetCode" workflow already does the parsing and pushing — this extension just refreshes the session secrets and triggers it.</div>
+        <a class="gh-link" id="openGithubLink" href="#">Open GitHub →</a>
+      </div>
+    </div>
+
+    <!-- TILE 2: Configuration -->
+    <div class="tile config-tile">
+      <div class="field-group">
+        <label class="field-label" for="patInput">Fine-Grained Token</label>
+        <input class="field-input" id="patInput" type="password" placeholder="github_pat_..." autocomplete="off" />
+        <div class="field-hint">Needs Secrets: write + Actions: write on the target repo.</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="repoInput">Target Repository</label>
+        <input class="field-input" id="repoInput" type="text" placeholder="username/repository" autocomplete="off" />
+      </div>
+      <div class="save-row">
+        <button class="save-btn" id="saveConfigBtn">Save locally</button>
+      </div>
+    </div>
+
+    <!-- TILE 3: Run Trigger -->
+    <div class="tile run-tile">
+      <button class="run-btn" id="runBtn">🔄 Sync Session &amp; Trigger Action</button>
+      <div class="status-banner" id="statusBanner"></div>
+      <div class="hint">Reads your LeetCode session cookies locally, encrypts them into your repo's Actions secrets, then runs your workflow.</div>
+    </div>
+
+  </div>
+
+  <script src="vendor/sodium-bundle.js"></script>
+  <script>
+    if (typeof sodium === "undefined") {
+      document.addEventListener("DOMContentLoaded", () => {
+        const banner = document.getElementById("statusBanner");
+        banner.className = "status-banner visible status-error";
+        banner.textContent = "⚠️ vendor/sodium-bundle.js failed to load — check it sits next to popup.html and reload the extension.";
+      });
+    }
+  </script>
+  <script src="popup.js"></script>
+</body>
+</html>

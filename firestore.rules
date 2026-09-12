@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: Check if request is authenticated with the authorized admin Google account
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email.lower() == 'srikarsensai@gmail.com';
+    }
+
+    // 1. Portfolio Data:
+    // Public visitors can read/load portfolio content.
+    // ONLY Srikar's verified Google account can update or overwrite it!
+    match /portfolio/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 2. Contact Inquiries:
+    // Any visitor can submit a message (create only).
+    // ONLY Srikar can read, update, or delete incoming contact messages.
+    match /messages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Default fallback: deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

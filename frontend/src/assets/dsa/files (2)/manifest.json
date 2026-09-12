@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Secure LeetSync Pro",
+  "version": "2.0.0",
+  "description": "Reads your LeetCode session locally and hands it to your own GitHub Action via encrypted repo secrets — no scraping, no third parties.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Secure LeetSync Pro"
+  },
+  "permissions": [
+    "storage",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://api.github.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  }
+}

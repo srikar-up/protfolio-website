@@ -4,7 +4,7 @@
 }
 
 body {
-  zoom: 0.8;
+  zoom: 0.9;
 }
 
 @media print {
@@ -13,6 +13,32 @@ body {
     background-color: #ffffff !important;
     background: #ffffff !important;
   }
+}
+
+/* Shift content sections right on desktop to ensure StickyOutline never collides with cards */
+@media (min-width: 1200px) {
+  .sections-shifted-right {
+    margin-left: 120px !important;
+    max-width: calc(100% - 120px) !important;
+  }
+}
+@media (min-width: 1380px) {
+  .sections-shifted-right {
+    margin-left: 150px !important;
+    max-width: calc(100% - 150px) !important;
+  }
+}
+@media (min-width: 1600px) {
+  .sections-shifted-right {
+    margin-left: 180px !important;
+    max-width: calc(100% - 180px) !important;
+  }
+}
+
+/* Left-to-Right Fade CSS Mask for Portrait Integration */
+.image-fade-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%);
+  mask-image: linear-gradient(to right, transparent 0%, black 35%);
 }
 
 .accent-green {
@@ -42,12 +68,23 @@ body {
 }
 
 /* Hide scrollbar for clean touch/trackpad carousels */
-.no-scrollbar::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.no-scrollbar {
+.no-scrollbar,
+.hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Modal open animation */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-animate {
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Fluid Layout Transitions */

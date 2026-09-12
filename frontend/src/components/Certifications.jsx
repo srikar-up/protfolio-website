@@ -10,6 +10,7 @@ const defaultCertifications = [
     year: "2026",
     credentialId: "DLAI-NN-40912",
     credentialUrl: "https://coursera.org/verify/specialization/DLAI",
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000&auto=format&fit=crop",
     skills: ["Neural Networks", "TensorFlow", "CNNs", "Transformers", "Hyperparameter Tuning"],
     desc: "Mastering foundational deep learning architectures, convolutional neural networks for computer vision, and sequence models using TensorFlow."
   },
@@ -21,6 +22,7 @@ const defaultCertifications = [
     year: "2025",
     credentialId: "IBM-DS-98214",
     credentialUrl: "https://coursera.org/verify/professional-cert/IBM-DS",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop",
     skills: ["Python", "SQL", "Data Analysis", "Machine Learning", "Data Visualization"],
     desc: "Comprehensive 10-course professional curriculum covering statistical modeling, Python data pipelines, machine learning algorithms, and database querying."
   },
@@ -32,6 +34,7 @@ const defaultCertifications = [
     year: "2025",
     credentialId: "GOOG-ADA-8711",
     credentialUrl: "https://coursera.org/verify/professional-cert/GOOGLE-ADA",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop",
     skills: ["Predictive Modeling", "Statistics", "EDA", "Python", "Tableau"],
     desc: "End-to-end data analytics lifecycle, exploratory data analysis, hypothesis testing, and production regression modeling."
   },
@@ -43,6 +46,7 @@ const defaultCertifications = [
     year: "2025",
     credentialId: "META-FED-3329",
     credentialUrl: "https://coursera.org/verify/professional-cert/META-FED",
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1000&auto=format&fit=crop",
     skills: ["React.js", "Modern JavaScript", "UI/UX Design", "CSS Architecture"],
     desc: "Core frontend systems architecture, component lifecycle optimization, accessible UI development, and responsive bento layouts."
   },
@@ -54,6 +58,7 @@ const defaultCertifications = [
     year: "2026",
     credentialId: "AWS-MLS-6610",
     credentialUrl: "https://aws.amazon.com/verification",
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop",
     skills: ["AWS SageMaker", "Cloud ML Pipelines", "Model Deployment", "Feature Stores"],
     desc: "Architecting and deploying production-grade machine learning workflows, automated ETL pipelines, and feature stores on AWS cloud infrastructure."
   }
@@ -199,7 +204,7 @@ export default function Certifications({ items }) {
             >
               <div>
                 {/* Top row: Issuer badge & Year */}
-                <div className="flex justify-between items-center mb-5">
+                <div className="flex justify-between items-center mb-4">
                   <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60">
                     <svg className="w-3 h-3 text-brand-orange" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -210,6 +215,20 @@ export default function Certifications({ items }) {
                     {cert.year}
                   </span>
                 </div>
+
+                {/* Certificate Badge / Document Image Banner */}
+                {cert.image && (
+                  <div className="w-full h-36 sm:h-40 rounded-2xl overflow-hidden mb-4 relative bg-zinc-100 dark:bg-zinc-850 border border-zinc-200/40 dark:border-zinc-800/40 shrink-0">
+                    <img 
+                      src={cert.image} 
+                      alt={cert.title} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" 
+                      loading="lazy"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  </div>
+                )}
 
                 {/* Certificate Title */}
                 <h3 className="font-sans font-bold text-xl text-zinc-900 dark:text-white group-hover:text-brand-orange bento-transition tracking-tight leading-snug">
@@ -308,6 +327,20 @@ export default function Certifications({ items }) {
             </div>
 
             {/* Modal Body */}
+            {selectedCert.image && (
+              <div className="mb-6 w-full h-44 sm:h-52 rounded-2xl overflow-hidden relative border border-zinc-200/40 dark:border-zinc-800/40 bg-zinc-100 dark:bg-zinc-900 shrink-0">
+                <img 
+                  src={selectedCert.image} 
+                  alt={selectedCert.title} 
+                  className="w-full h-full object-cover"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+                <div className="absolute bottom-2.5 left-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[9px] font-mono text-white/90 border border-white/10">
+                  CREDENTIAL PREVIEW
+                </div>
+              </div>
+            )}
+
             <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed mb-6">
               {selectedCert.desc}
             </p>

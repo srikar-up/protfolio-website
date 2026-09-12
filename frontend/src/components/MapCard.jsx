@@ -9,7 +9,7 @@ export default function MapCard({ data }) {
   };
 
   return (
-    <div id="location" className="lg:col-span-4 bg-white dark:bg-brand-darkCard rounded-[2rem] p-8 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 min-h-[460px] flex flex-col justify-between bento-transition explode-level-1 overflow-hidden relative">
+    <div id="location" className="lg:col-span-4 bg-white dark:bg-brand-darkCard rounded-[2rem] p-6 sm:p-7 shadow-soft dark:shadow-soft-dark border border-zinc-200/30 dark:border-zinc-800/20 min-h-[320px] md:min-h-[340px] flex flex-col justify-between bento-transition explode-level-1 overflow-hidden relative">
       {/* Background map grid coordinate overlay */}
       <div className="absolute inset-0 map-grid opacity-80 z-0 pointer-events-none"></div>
       

@@ -141,14 +141,31 @@ export const fetchPortfolioFromFirebase = async () => {
 };
 
 /**
+ * Verify whether the currently active user is the authenticated admin.
+ */
+export const isUserAdmin = () => {
+  if (!auth || !auth.currentUser) return false;
+  const currentEmail = (auth.currentUser.email || '').trim().toLowerCase();
+  return currentEmail === getAdminEmail();
+};
+
+/**
  * Save complete portfolio data to Cloud Firestore with safe merge.
+ * Strictly verifies that the caller is authenticated as Srikar before writing.
  */
 export const savePortfolioToFirebase = async (data) => {
   if (!firestore) return false;
+
+  // Security Guard: Prevent unauthenticated database writes
+  if (!isUserAdmin()) {
+    console.error(`🔒 [Security Guard] Blocked unauthorized write attempt. Current user is not authenticated as ${getAdminEmail()}`);
+    return false;
+  }
+
   try {
     const docRef = doc(firestore, 'portfolio', 'data');
     await setDoc(docRef, data, { merge: true });
-    console.log('✅ [Cloud Firestore] Portfolio successfully written to Cloud Firestore!');
+    console.log('✅ [Cloud Firestore] Portfolio successfully written to Cloud Firestore by verified admin!');
     return true;
   } catch (error) {
     console.error('❌ [Cloud Firestore] Save error (check Firestore Rules in Firebase Console):', error);
@@ -161,6 +178,7 @@ export const savePortfolioToFirebase = async (data) => {
  */
 export const updateGithubKpiInFirebase = async (kpiMetrics) => {
   if (!firestore) return false;
+  if (!isUserAdmin()) return false;
   try {
     const docRef = doc(firestore, 'portfolio', 'data');
     await setDoc(docRef, { githubKpi: kpiMetrics }, { merge: true });

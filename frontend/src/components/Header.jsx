@@ -57,7 +57,7 @@ export default function Header({ navigateTo, isCV }) {
         ? 'bg-brand-lightBg/80 dark:bg-brand-darkBg/80 backdrop-blur-md border-b border-zinc-200/10 dark:border-zinc-800/10 py-3 shadow-md' 
         : 'bg-transparent py-6 border-transparent'
     }`}>
-      <div className="max-w-6xl mx-auto flex justify-between items-center px-6 md:px-12 relative">
+      <div className="max-w-6xl mx-auto px-6 md:px-12 relative flex justify-between items-center">
         
         {/* Brand Mark and Meta Email */}
         <div className="flex items-center space-x-6">

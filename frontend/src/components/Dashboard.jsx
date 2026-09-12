@@ -31,6 +31,7 @@ export default function Dashboard({ data, onSave, onClose }) {
 
   const tabs = [
     { id: 'hero', label: 'Hero Section' },
+    { id: 'about', label: 'About Me' },
     { id: 'location', label: 'Location' },
     { id: 'github', label: 'GitHub KPI' },
     { id: 'projects', label: 'Projects' },
@@ -119,6 +120,24 @@ export default function Dashboard({ data, onSave, onClose }) {
     });
   };
 
+  // Helper to update fields in the About Me / Philosophy object
+  const updateAboutField = (field, value) => {
+    setLocalData(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (!updated.aboutQuote) {
+        updated.aboutQuote = {
+          badge: "ABOUT ME • PHILOSOPHY •",
+          quote: "Design is not just what it looks like and feels like. Design is how it works.",
+          author: "Steve Jobs",
+          role: "Apple Co-founder",
+          reflection: "Building high-performance data systems, machine learning workflows, and intuitive interfaces crafted with precision and purpose."
+        };
+      }
+      updated.aboutQuote[field] = value;
+      return updated;
+    });
+  };
+
   // Helper to update fields in the Location object
   const updateLocationField = (field, value) => {
     setLocalData(prev => {
@@ -177,6 +196,111 @@ export default function Dashboard({ data, onSave, onClose }) {
     });
   };
 
+  // Helper to add an image URL to a project
+  const addProjectImage = (projectIndex) => {
+    setLocalData(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (updated.projects && updated.projects[projectIndex]) {
+        const proj = updated.projects[projectIndex];
+        if (!Array.isArray(proj.images)) {
+          proj.images = proj.image ? [proj.image] : [];
+        }
+        proj.images.push('');
+        if (!Array.isArray(proj.imageTags)) {
+          proj.imageTags = proj.images.map(() => '');
+        } else {
+          proj.imageTags.push('');
+        }
+        proj.image = typeof proj.images[0] === 'object' ? (proj.images[0]?.url || '') : (proj.images[0] || '');
+      }
+      return updated;
+    });
+  };
+
+  // Helper to update a specific image URL in a project
+  const updateProjectImage = (projectIndex, imageIndex, value) => {
+    setLocalData(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (updated.projects && updated.projects[projectIndex]) {
+        const proj = updated.projects[projectIndex];
+        if (!Array.isArray(proj.images)) {
+          proj.images = proj.image ? [proj.image] : [];
+        }
+        if (typeof proj.images[imageIndex] === 'object' && proj.images[imageIndex] !== null) {
+          proj.images[imageIndex].url = value;
+        } else {
+          proj.images[imageIndex] = value;
+        }
+        proj.image = typeof proj.images[0] === 'object' ? (proj.images[0]?.url || '') : (proj.images[0] || '');
+      }
+      return updated;
+    });
+  };
+
+  // Helper to update a specific image tag/label in a project
+  const updateProjectImageTag = (projectIndex, imageIndex, tagValue) => {
+    setLocalData(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (updated.projects && updated.projects[projectIndex]) {
+        const proj = updated.projects[projectIndex];
+        if (!Array.isArray(proj.imageTags)) {
+          proj.imageTags = (proj.images || []).map(() => '');
+        }
+        while (proj.imageTags.length <= imageIndex) {
+          proj.imageTags.push('');
+        }
+        proj.imageTags[imageIndex] = tagValue;
+
+        if (typeof proj.images[imageIndex] === 'object' && proj.images[imageIndex] !== null) {
+          proj.images[imageIndex].tag = tagValue;
+        }
+      }
+      return updated;
+    });
+  };
+
+  // Helper to remove an image URL from a project
+  const removeProjectImage = (projectIndex, imageIndex) => {
+    setLocalData(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (updated.projects && updated.projects[projectIndex]) {
+        const proj = updated.projects[projectIndex];
+        if (!Array.isArray(proj.images)) {
+          proj.images = proj.image ? [proj.image] : [];
+        }
+        proj.images.splice(imageIndex, 1);
+        if (Array.isArray(proj.imageTags)) {
+          proj.imageTags.splice(imageIndex, 1);
+        }
+        proj.image = typeof proj.images[0] === 'object' ? (proj.images[0]?.url || '') : (proj.images[0] || '');
+      }
+      return updated;
+    });
+  };
+
+  // Helper to set an image as cover (moves to first position)
+  const setProjectCoverImage = (projectIndex, imageIndex) => {
+    setLocalData(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      if (updated.projects && updated.projects[projectIndex]) {
+        const proj = updated.projects[projectIndex];
+        if (!Array.isArray(proj.images)) {
+          proj.images = proj.image ? [proj.image] : [];
+        }
+        const [selected] = proj.images.splice(imageIndex, 1);
+        proj.images.unshift(selected);
+
+        if (Array.isArray(proj.imageTags)) {
+          const [selectedTag] = proj.imageTags.splice(imageIndex, 1);
+          proj.imageTags.unshift(selectedTag || '');
+        }
+
+        proj.image = typeof proj.images[0] === 'object' ? (proj.images[0]?.url || '') : (proj.images[0] || '');
+      }
+      return updated;
+    });
+  };
+
   // Add Item Helper using deep copy
   const handleAddItem = () => {
     setLocalData(prev => {
@@ -191,7 +315,11 @@ export default function Dashboard({ data, onSave, onClose }) {
           title: 'New Project',
           desc: 'Brief description of your project.',
           content: 'Detailed explanation of project features and accomplishments.',
-          demoUrl: 'https://example.com'
+          demoUrl: 'https://example.com',
+          image: '',
+          images: [],
+          videoUrl: '',
+          showInCv: true
         };
         updated.projects.push(newItem);
         setSelectedItemIndex(updated.projects.length - 1);
@@ -204,6 +332,7 @@ export default function Dashboard({ data, onSave, onClose }) {
           year: new Date().getFullYear().toString(),
           credentialId: 'CERT-' + Math.floor(10000 + Math.random() * 90000),
           credentialUrl: 'https://example.com/verify',
+          image: '',
           skills: ['Skill 1', 'Skill 2', 'Skill 3'],
           desc: 'Description of what this credential covers and core methodologies mastered.'
         };
@@ -420,7 +549,7 @@ export default function Dashboard({ data, onSave, onClose }) {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Record List</h3>
-              {activeTab !== 'hero' && activeTab !== 'location' && activeTab !== 'github' && (
+              {activeTab !== 'hero' && activeTab !== 'about' && activeTab !== 'location' && activeTab !== 'github' && (
                 <button 
                   onClick={handleAddItem}
                   className="text-[10px] font-mono text-brand-orange font-bold hover:underline"
@@ -436,6 +565,13 @@ export default function Dashboard({ data, onSave, onClose }) {
                   <h4 className="text-xs font-bold text-zinc-850 dark:text-zinc-200">Hero Section</h4>
                   <p className="text-[10px] font-mono text-zinc-400 mt-1 leading-relaxed">
                     Updates the primary greeting, titles, bio, and business card details shown on the homepage.
+                  </p>
+                </div>
+              ) : activeTab === 'about' ? (
+                <div className="p-4 rounded-xl border border-brand-orange/45 bg-brand-orange/5 text-left">
+                  <h4 className="text-xs font-bold text-zinc-850 dark:text-zinc-200">About Me & Philosophy</h4>
+                  <p className="text-[10px] font-mono text-zinc-400 mt-1 leading-relaxed">
+                    Configure your core philosophy quote statement, author attribution, role, and personal reflection shown on the homepage About Me card.
                   </p>
                 </div>
               ) : activeTab === 'location' ? (
@@ -465,6 +601,14 @@ export default function Dashboard({ data, onSave, onClose }) {
                 >
                   <div className="flex justify-between items-start gap-2">
                     <div className="flex items-center space-x-2">
+                      {item.image && (
+                        <img 
+                          src={item.image} 
+                          alt="" 
+                          className="w-5 h-5 rounded object-cover shrink-0 border border-zinc-200 dark:border-zinc-700" 
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                      )}
                       <h4 className="text-xs font-bold text-zinc-850 dark:text-zinc-200 line-clamp-1">
                         {item.title || item.label || `Record #${index + 1}`}
                       </h4>
@@ -601,6 +745,66 @@ export default function Dashboard({ data, onSave, onClose }) {
                     type="text" 
                     value={localData.hero?.cardGithub || ''} 
                     onChange={(e) => updateHeroField('cardGithub', e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+              </div>
+            </div>
+          ) : activeTab === 'about' ? (
+            <div className="space-y-6 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <h4 className="text-xs font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-2 border-b pb-1 dark:border-zinc-800/40">Philosophy Statement & Attribution</h4>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Quote Statement</label>
+                  <textarea 
+                    rows="3"
+                    value={localData.aboutQuote?.quote || ''} 
+                    onChange={(e) => updateAboutField('quote', e.target.value)}
+                    placeholder="Design is not just what it looks like and feels like. Design is how it works."
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition resize-none"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">The primary statement displayed on the About Me card.</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Author (e.g. Steve Jobs)</label>
+                  <input 
+                    type="text" 
+                    value={localData.aboutQuote?.author || ''} 
+                    onChange={(e) => updateAboutField('author', e.target.value)}
+                    placeholder="Steve Jobs"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Author Role (e.g. Apple Co-founder)</label>
+                  <input 
+                    type="text" 
+                    value={localData.aboutQuote?.role || ''} 
+                    onChange={(e) => updateAboutField('role', e.target.value)}
+                    placeholder="Apple Co-founder"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Personal Reflection / Philosophy Note</label>
+                  <textarea 
+                    rows="3"
+                    value={localData.aboutQuote?.reflection || ''} 
+                    onChange={(e) => updateAboutField('reflection', e.target.value)}
+                    placeholder="Building high-performance data systems, machine learning workflows, and intuitive interfaces..."
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition resize-none"
+                  />
+                  <p className="text-[9px] font-mono text-zinc-400 mt-1">Explains your engineering ethos, machine learning craft, and system design approach.</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Badge Header Label</label>
+                  <input 
+                    type="text" 
+                    value={localData.aboutQuote?.badge || ''} 
+                    onChange={(e) => updateAboutField('badge', e.target.value)}
+                    placeholder="ABOUT ME • PHILOSOPHY •"
                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
                   />
                 </div>
@@ -810,6 +1014,154 @@ export default function Dashboard({ data, onSave, onClose }) {
                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition"
                       />
                     </div>
+                    {/* Multi-Image Management Section */}
+                    <div className="md:col-span-2 p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-200 dark:border-zinc-800/80 pb-3">
+                        <div>
+                          <label className="block text-[11px] font-mono text-zinc-900 dark:text-zinc-100 uppercase tracking-wider font-bold">
+                            Project Images & Screenshots Gallery ({(() => {
+                              const list = Array.isArray(currentItem.images) && currentItem.images.length > 0 
+                                ? currentItem.images 
+                                : (currentItem.image ? [currentItem.image] : []);
+                              return list.length;
+                            })()})
+                          </label>
+                          <span className="text-[10px] font-mono text-zinc-400">
+                            Add multiple image URLs. The first image (#1) acts as the primary cover photo for the card.
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => addProjectImage(selectedItemIndex)}
+                          className="px-3.5 py-1.5 rounded-xl bg-brand-orange hover:bg-brand-orangeHover text-white text-[11px] font-mono font-bold bento-transition flex items-center gap-1.5 shadow-sm shrink-0 self-start sm:self-auto cursor-pointer"
+                        >
+                          <span>+ Add Image</span>
+                        </button>
+                      </div>
+
+                      {/* Image List */}
+                      <div className="space-y-3">
+                        {(() => {
+                          const list = Array.isArray(currentItem.images) && currentItem.images.length > 0 
+                            ? currentItem.images 
+                            : (currentItem.image ? [currentItem.image] : []);
+
+                          if (list.length === 0) {
+                            return (
+                              <div className="py-8 text-center border border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl bg-white/50 dark:bg-zinc-900/30">
+                                <p className="text-xs font-mono text-zinc-400">No project images configured yet.</p>
+                                <button
+                                  type="button"
+                                  onClick={() => addProjectImage(selectedItemIndex)}
+                                  className="mt-2 text-xs font-mono text-brand-orange font-bold hover:underline cursor-pointer"
+                                >
+                                  + Click here to add the first screenshot URL
+                                </button>
+                              </div>
+                            );
+                          }
+
+                          return list.map((imgItem, imgIdx) => {
+                            const imgUrl = typeof imgItem === 'object' && imgItem !== null ? (imgItem.url || '') : (imgItem || '');
+                            const imgTag = (Array.isArray(currentItem.imageTags) ? currentItem.imageTags[imgIdx] : '') || (typeof imgItem === 'object' && imgItem !== null ? imgItem.tag : '') || '';
+
+                            return (
+                              <div key={imgIdx} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+                                {/* Preview Thumbnail */}
+                                <div className="shrink-0 w-24 h-16 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center relative">
+                                  {imgUrl ? (
+                                    <img 
+                                      src={imgUrl} 
+                                      alt="" 
+                                      className="w-full h-full object-cover" 
+                                      onError={(e) => { e.target.style.display = 'none'; }}
+                                    />
+                                  ) : (
+                                    <span className="text-[9px] font-mono text-zinc-400 text-center px-1">Empty URL</span>
+                                  )}
+                                  <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/75 text-[8px] font-mono text-white font-bold">
+                                    #{imgIdx + 1}
+                                  </span>
+                                  {imgTag && (
+                                    <span className="absolute bottom-1 left-1 right-1 px-1 py-0.5 rounded bg-black/85 backdrop-blur-xs text-[8px] font-mono text-brand-orange truncate text-center font-semibold">
+                                      {imgTag}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Inputs: URL & Tag */}
+                                <div className="flex-1 w-full space-y-2">
+                                  <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
+                                    <div className="md:col-span-7">
+                                      <input
+                                        type="text"
+                                        placeholder="Image URL: https://... or /assets/..."
+                                        value={imgUrl}
+                                        onChange={(e) => updateProjectImage(selectedItemIndex, imgIdx, e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-2 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition font-mono"
+                                      />
+                                    </div>
+                                    <div className="md:col-span-5">
+                                      <input
+                                        type="text"
+                                        placeholder="Badge Tag (e.g. Dashboard View)"
+                                        value={imgTag}
+                                        onChange={(e) => updateProjectImageTag(selectedItemIndex, imgIdx, e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-2 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition font-mono font-medium"
+                                      />
+                                    </div>
+                                  </div>
+                                  {/* Quick Tag Suggestion Chips */}
+                                  <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                    <span className="text-[9px] font-mono text-zinc-400">Quick Tags:</span>
+                                    {['Dashboard View', 'Orbital Mapping', 'Data Systems', 'Architecture', 'UI Components', 'Sandbox Live'].map((preset) => (
+                                      <button
+                                        key={preset}
+                                        type="button"
+                                        onClick={() => updateProjectImageTag(selectedItemIndex, imgIdx, preset)}
+                                        className={`text-[9px] font-mono px-2 py-0.5 rounded-full border bento-transition cursor-pointer ${
+                                          imgTag === preset
+                                            ? 'bg-brand-orange text-white border-brand-orange font-bold'
+                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-brand-orange/15 hover:text-brand-orange border-zinc-200/60 dark:border-zinc-700/60'
+                                        }`}
+                                      >
+                                        +{preset}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {/* Actions: Cover badge & Delete */}
+                                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                                  {imgIdx === 0 ? (
+                                    <span className="text-[9px] font-mono px-2 py-1 rounded-full bg-brand-orange/15 text-brand-orange font-bold border border-brand-orange/30">
+                                      ★ COVER
+                                    </span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => setProjectCoverImage(selectedItemIndex, imgIdx)}
+                                      className="text-[9px] font-mono px-2 py-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-800 transition-colors cursor-pointer"
+                                      title="Set as main card cover photo"
+                                    >
+                                      Set Cover
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => removeProjectImage(selectedItemIndex, imgIdx)}
+                                    className="text-xs text-zinc-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-500/10 font-mono transition-colors cursor-pointer"
+                                    title="Remove Image"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
                     <div className="md:col-span-2">
                       <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Short Card Description</label>
                       <input 
@@ -893,6 +1245,29 @@ export default function Dashboard({ data, onSave, onClose }) {
                         placeholder="https://coursera.org/verify/..."
                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition font-mono"
                       />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Certificate Badge / Document Image URL (image)</label>
+                      <div className="flex flex-col sm:flex-row gap-3 items-start">
+                        <input 
+                          type="text" 
+                          placeholder="e.g. https://images.unsplash.com/... or certificate image URL"
+                          value={currentItem.image || ''} 
+                          onChange={(e) => updateField('certifications', selectedItemIndex, 'image', e.target.value)}
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-brand-orange rounded-xl p-3.5 text-xs text-zinc-850 dark:text-zinc-100 outline-none bento-transition font-mono"
+                        />
+                        {currentItem.image && (
+                          <div className="shrink-0 w-24 h-16 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900 shadow-sm">
+                            <img 
+                              src={currentItem.image} 
+                              alt="Preview" 
+                              className="w-full h-full object-cover"
+                              onError={(e) => { e.target.style.display = 'none'; }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-[9px] font-mono text-zinc-400 mt-1">Image will be showcased on the certificate card and inside the verification modal.</p>
                     </div>
                     <div className="md:col-span-2">
                       <label className="block text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Covered Skills & Competencies (comma separated)</label>

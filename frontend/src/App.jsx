@@ -7,8 +7,8 @@ import About from './components/About'; // Represents Card 1 (Experience)
 import SkillsCard from './components/SkillsCard'; // Represents Card 2 (Skills Set)
 import ReadingList from './components/ReadingList'; // Represents Card 3 (Reading List)
 import Blog from './components/Blog'; // Represents Curated Writings (Blog Notebook)
-import MapCard from './components/MapCard'; // Represents Card 4 (Punjab Map)
-import Process from './components/Process'; // Represents Card 5 (How I Work)
+import MapCard from './components/MapCard'; // Represents About Me (Punjab Map)
+import AboutQuote from './components/AboutQuote'; // Represents About Me (Philosophy & Quotes with Linear Overlay)
 import Contact from './components/Contact'; // Contact Bento Card
 import Footer from './components/Footer';
 import Dashboard from './components/Dashboard';
@@ -18,7 +18,7 @@ import BlogsPage from './components/BlogsPage';
 import StickyOutline from './components/StickyOutline';
 import Certifications from './components/Certifications';
 import GitHubContributions from './components/GitHubContributions';
-import { fetchPortfolioFromFirebase, savePortfolioToFirebase, isFirebaseConfigured } from './firebase';
+import { fetchPortfolioFromFirebase, savePortfolioToFirebase, isFirebaseConfigured, isUserAdmin } from './firebase';
 import heroLightImg from './assets/herolight.webp';
 import heroDarkImg from './assets/herodark.webp';
 
@@ -33,6 +33,17 @@ const fallbackData = {
       desc: "An award-winning viewport framework operating custom spatial coordinates using raw JS layouts.",
       content: "Aether OS is an experimental spatial viewport manager designed for modern desktop web applications. It uses hardware-accelerated transform layers to let users snap, scale, and stack multiple windows seamlessly on a virtual desktop canvas.",
       demoUrl: "https://aether.system",
+      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop",
+      images: [
+        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1000&auto=format&fit=crop"
+      ],
+      imageTags: [
+        "Dashboard View",
+        "Orbital Mapping",
+        "Data Systems"
+      ],
       videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       showInCv: true
     },
@@ -44,6 +55,17 @@ const fallbackData = {
       desc: "A hyper-optimized component foundry yielding zero layout jank on standard browser renders.",
       content: "Nova Core is a high-performance design system library built using utility-first styling tokens. It compiles to zero runtime CSS overhead, achieving sub-millisecond layout passes and eliminating layout shifts on dynamic screens.",
       demoUrl: "https://nova.core",
+      image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=1000&auto=format&fit=crop",
+      images: [
+        "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1542744094-3a31f272c490?q=80&w=1000&auto=format&fit=crop"
+      ],
+      imageTags: [
+        "Component Core",
+        "Design Tokens",
+        "Layout Benchmark"
+      ],
       videoUrl: "",
       showInCv: true
     },
@@ -55,6 +77,15 @@ const fallbackData = {
       desc: "A secure crypto dashboard designed to track assets, complete with rich SVG data charting.",
       content: "CryptVault is a student capstone project creating a secure, client-side dashboard for decentralized finance networks. Features offline keys storage, custom SVG path charting for historical prices, and MetaMask integration.",
       demoUrl: "https://vault.crypt",
+      image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1000&auto=format&fit=crop",
+      images: [
+        "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1642543492481-44e81e3914a7?q=80&w=1000&auto=format&fit=crop"
+      ],
+      imageTags: [
+        "Vault Dashboard",
+        "SVG Charting"
+      ],
       videoUrl: "",
       showInCv: false
     },
@@ -66,8 +97,81 @@ const fallbackData = {
       desc: "An automated agent search tool integrating NCBI PubMed APIs and semantic summaries.",
       content: "AIScholar is an AI assistant that queries literature databases like PubMed and arXiv, extracts key methodology abstracts, and utilizes local language model embeddings to construct comparative research grids.",
       demoUrl: "https://scholar.ai",
+      image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1000&auto=format&fit=crop",
+      images: [
+        "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop"
+      ],
+      imageTags: [
+        "Literature Finder",
+        "Research Grids",
+        "Vector Embeddings"
+      ],
       videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       showInCv: true
+    }
+  ],
+  certifications: [
+    {
+      id: 1,
+      title: "Deep Learning Specialization",
+      issuer: "DeepLearning.AI",
+      platform: "Coursera",
+      year: "2026",
+      credentialId: "DLAI-NN-40912",
+      credentialUrl: "https://coursera.org/verify/specialization/DLAI",
+      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000&auto=format&fit=crop",
+      skills: ["Neural Networks", "TensorFlow", "CNNs", "Transformers", "Hyperparameter Tuning"],
+      desc: "Mastering foundational deep learning architectures, convolutional neural networks for computer vision, and sequence models using TensorFlow."
+    },
+    {
+      id: 2,
+      title: "IBM Data Science Professional",
+      issuer: "IBM",
+      platform: "Coursera",
+      year: "2025",
+      credentialId: "IBM-DS-98214",
+      credentialUrl: "https://coursera.org/verify/professional-cert/IBM-DS",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop",
+      skills: ["Python", "SQL", "Data Analysis", "Machine Learning", "Data Visualization"],
+      desc: "Comprehensive 10-course professional curriculum covering statistical modeling, Python data pipelines, machine learning algorithms, and database querying."
+    },
+    {
+      id: 3,
+      title: "Google Advanced Data Analytics",
+      issuer: "Google",
+      platform: "Google Career Certificates",
+      year: "2025",
+      credentialId: "GOOG-ADA-8711",
+      credentialUrl: "https://coursera.org/verify/professional-cert/GOOGLE-ADA",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop",
+      skills: ["Predictive Modeling", "Statistics", "EDA", "Python", "Tableau"],
+      desc: "End-to-end data analytics lifecycle, exploratory data analysis, hypothesis testing, and production regression modeling."
+    },
+    {
+      id: 4,
+      title: "Meta Front-End Developer Professional",
+      issuer: "Meta",
+      platform: "Coursera",
+      year: "2025",
+      credentialId: "META-FED-3329",
+      credentialUrl: "https://coursera.org/verify/professional-cert/META-FED",
+      image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1000&auto=format&fit=crop",
+      skills: ["React.js", "Modern JavaScript", "UI/UX Design", "CSS Architecture"],
+      desc: "Core frontend systems architecture, component lifecycle optimization, accessible UI development, and responsive bento layouts."
+    },
+    {
+      id: 5,
+      title: "AWS Machine Learning Foundations",
+      issuer: "Amazon Web Services",
+      platform: "AWS Training",
+      year: "2026",
+      credentialId: "AWS-MLS-6610",
+      credentialUrl: "https://aws.amazon.com/verification",
+      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop",
+      skills: ["AWS SageMaker", "Cloud ML Pipelines", "Model Deployment", "Feature Stores"],
+      desc: "Architecting and deploying production-grade machine learning workflows, automated ETL pipelines, and feature stores on AWS cloud infrastructure."
     }
   ],
   blogs: [
@@ -297,6 +401,13 @@ const fallbackData = {
     tag: "HQ",
     fullAddress: "Lovely Professional University, Punjab, India (GMT +5:30)"
   },
+  aboutQuote: {
+    badge: "ABOUT ME • PHILOSOPHY •",
+    quote: "Design is not just what it looks like and feels like. Design is how it works.",
+    author: "Steve Jobs",
+    role: "Apple Co-founder",
+    reflection: "Building high-performance data systems, machine learning workflows, and intuitive interfaces crafted with precision and purpose."
+  },
   githubKpi: {
     repos: 1,
     followers: 1,
@@ -504,8 +615,8 @@ function MainApp() {
         proj.showInCv = proj.showInCv === false ? true : false;
       }
       
-      // Sync with Firebase Firestore
-      if (isFirebaseConfigured()) {
+      // Sync with Firebase Firestore only if active user is verified admin
+      if (isFirebaseConfigured() && isUserAdmin()) {
         savePortfolioToFirebase(updated).catch(err => console.warn('Could not sync CV toggle with Firebase:', err));
       }
 
@@ -580,38 +691,45 @@ function MainApp() {
             onClose={() => navigateTo('/')}
           />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          <div className="w-full flex flex-col space-y-6">
             
             {/* Hero Block (Transparent, occupies full screen width/height) */}
-            <Hero data={portfolioData.hero} navigateTo={navigateTo} />
+            <div className="w-full">
+              <Hero data={portfolioData.hero} navigateTo={navigateTo} />
+            </div>
 
-            {/* Projects Showcase (Full-width horizontal tactile slider) */}
-            <Projects items={portfolioData.projects} onToggleCv={handleToggleCvProject} />
+            {/* Main Content Sections (Shifted right on desktop to prevent StickyOutline collision) */}
+            <div className="w-full sections-shifted-right grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              
+              {/* About Me Section: Location Map & Philosophy with Quotes (Placed directly after Overview) */}
+              <MapCard data={portfolioData.location} />
+              <AboutQuote data={portfolioData.aboutQuote} />
 
-            {/* Certifications Showcase (Full-width horizontal tactile slider, like blogs & projects) */}
-            <Certifications items={portfolioData.certifications} />
+              {/* Projects Showcase (Full-width horizontal tactile slider) */}
+              <Projects items={portfolioData.projects} onToggleCv={handleToggleCvProject} />
 
-            {/* Bento Grid: Core Profile & Background */}
-            {/* Experience, Skills, My Reads */}
-            <About timeline={portfolioData.timeline} />
-            <SkillsCard skills={portfolioData.skills} />
-            <ReadingList books={portfolioData.books} />
+              {/* Certifications Showcase (Full-width horizontal tactile slider, like blogs & projects) */}
+              <Certifications items={portfolioData.certifications} />
 
-            {/* GitHub Contributions & Open Source Heatmap */}
-            <GitHubContributions 
-              username={portfolioData.hero?.cardGithub || 'srikar-up'} 
-              kpiData={portfolioData.githubKpi} 
-            />
+              {/* Bento Grid: Core Profile & Background */}
+              {/* Experience, Skills, My Reads */}
+              <About timeline={portfolioData.timeline} />
+              <SkillsCard skills={portfolioData.skills} />
+              <ReadingList books={portfolioData.books} />
 
-            {/* Curated Writings (Blog) (Full-width horizontal tactile slider) */}
-            <Blog blogs={portfolioData.blogs} />
+              {/* GitHub Contributions & Open Source Heatmap */}
+              <GitHubContributions 
+                username={portfolioData.hero?.cardGithub || 'srikar-up'} 
+                kpiData={portfolioData.githubKpi} 
+              />
 
-            {/* Location Map & How I Work (Placed directly above Contact) */}
-            <MapCard data={portfolioData.location} />
-            <Process />
+              {/* Curated Writings (Blog) (Full-width horizontal tactile slider) */}
+              <Blog blogs={portfolioData.blogs} />
 
-            {/* Contact / Get in Touch */}
-            <Contact />
+              {/* Contact / Get in Touch */}
+              <Contact />
+
+            </div>
 
           </div>
         )}

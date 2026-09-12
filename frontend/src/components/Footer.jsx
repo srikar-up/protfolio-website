@@ -61,7 +61,7 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource, loca
       </div>
 
       {/* Pure Text-Based Footer directly on canvas (No container box) */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 my-6">
+      <div className="relative z-10 max-w-6xl mx-auto sections-shifted-right px-6 md:px-12 my-6">
         
         {/* Simple Clean Header: Only triangle logo and website name */}
         <div className="flex items-center space-x-3 mb-10 pb-6 border-b border-zinc-200/20 dark:border-white/10">
@@ -77,19 +77,19 @@ export default function Footer({ onToggleDashboard, navigateTo, dataSource, loca
             <h5 className="text-[10px] font-mono font-bold tracking-widest uppercase text-emerald-600 dark:text-brand-orange">Navigation</h5>
             <ul className="space-y-2 text-zinc-600 dark:text-zinc-300 font-medium">
               <li><a href="#hero" className="hover:text-brand-orange transition-colors">Overview</a></li>
+              <li><a href="#location" className="hover:text-brand-orange transition-colors">About Me</a></li>
               <li><a href="#projects" className="hover:text-brand-orange transition-colors">Projects</a></li>
               <li><a href="#certifications" className="hover:text-brand-orange transition-colors">Certifications</a></li>
-              <li><a href="#education" className="hover:text-brand-orange transition-colors">Experience</a></li>
             </ul>
           </div>
 
           <div className="space-y-2.5">
             <h5 className="text-[10px] font-mono font-bold tracking-widest uppercase text-emerald-600 dark:text-brand-orange">Writing & Work</h5>
             <ul className="space-y-2 text-zinc-600 dark:text-zinc-300 font-medium">
+              <li><a href="#education" className="hover:text-brand-orange transition-colors">Background</a></li>
               <li><a href="#blog" className="hover:text-brand-orange transition-colors">Notebook & Blogs</a></li>
               <li><a href="#reading-list" className="hover:text-brand-orange transition-colors">Reading Shelf</a></li>
               <li><a href="#github" className="hover:text-brand-orange transition-colors">GitHub Activity</a></li>
-              <li><a href="#location" className="hover:text-brand-orange transition-colors">How I Work</a></li>
             </ul>
           </div>
 
