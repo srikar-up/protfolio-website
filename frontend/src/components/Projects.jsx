@@ -877,24 +877,28 @@ export default function Projects({ items = [], onToggleCv }) {
           aria-modal="true"
           aria-label="Image gallery fullscreen preview"
         >
-          {/* Top Bar: Title, Active Tag, Counter & Close Button */}
+          {/* Top Bar: Title on top, Tag placed neatly below to prevent heading compression, Counter & Actions on right */}
           <div 
-            className="w-full max-w-6xl flex items-center justify-between z-20 shrink-0 text-white pb-3 select-none"
+            className="w-full max-w-6xl flex items-center justify-between gap-3 z-20 shrink-0 text-white pb-2.5 sm:pb-3 select-none"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center gap-3">
-              <span className="font-syne font-bold text-base sm:text-lg text-white/95 truncate max-w-[180px] sm:max-w-md">
+            {/* Left: Heading on top, Tag badge below */}
+            <div className="flex flex-col min-w-0 flex-1 pr-2">
+              <h2 className="font-syne font-bold text-sm sm:text-base md:text-lg text-white/95 truncate leading-tight">
                 {lightboxData.title}
-              </span>
+              </h2>
               {lightboxData.images[lightboxData.index]?.tag && (
-                <span className="px-3 py-1 rounded-full bg-white/10 text-white/90 text-[10px] font-mono font-semibold tracking-wider uppercase border border-white/15">
-                  {lightboxData.images[lightboxData.index].tag}
-                </span>
+                <div className="mt-1 flex items-center">
+                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-white/10 text-white/85 text-[9px] sm:text-[10px] font-mono font-medium tracking-wider uppercase border border-white/15 shrink-0 truncate max-w-[220px]">
+                    {lightboxData.images[lightboxData.index].tag}
+                  </span>
+                </div>
               )}
             </div>
 
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-mono text-white/60 tracking-widest uppercase">
+            {/* Right: Counter and Action Buttons (Never wrapped or compressed) */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <span className="text-[11px] sm:text-xs font-mono text-white/70 tracking-widest uppercase whitespace-nowrap">
                 {lightboxData.index + 1} / {lightboxData.images.length}
               </span>
               
@@ -904,10 +908,10 @@ export default function Projects({ items = [], onToggleCv }) {
                   href={lightboxData.images[lightboxData.index].url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-white/10"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-white/10 shrink-0"
                   title="Open full-resolution image in new tab"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
                 </a>
@@ -917,11 +921,11 @@ export default function Projects({ items = [], onToggleCv }) {
               <button 
                 type="button"
                 onClick={closeLightbox}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/15 hover:scale-105"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer border border-white/15 hover:scale-105 shrink-0"
                 title="Close Big Screen (Esc)"
                 aria-label="Close big screen preview"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -930,7 +934,7 @@ export default function Projects({ items = [], onToggleCv }) {
 
           {/* Center Image Stage with Floating Side Navigation Arrows */}
           <div 
-            className="relative w-full max-w-6xl flex-1 flex items-center justify-center my-auto min-h-0 px-2 sm:px-14"
+            className="relative w-full max-w-6xl flex-1 flex items-center justify-center my-auto min-h-0 px-1 sm:px-14"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Previous Arrow Button (<) */}
@@ -938,11 +942,11 @@ export default function Projects({ items = [], onToggleCv }) {
               <button
                 type="button"
                 onClick={handleLightboxPrev}
-                className="absolute left-1 sm:left-3 md:left-4 z-30 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-black/70 hover:bg-black/90 active:scale-90 text-white flex items-center justify-center border border-white/25 backdrop-blur-md transition-all shadow-2xl cursor-pointer group hover:border-brand-orange"
+                className="absolute left-1 sm:left-3 md:left-4 z-30 w-9 h-9 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 active:scale-90 text-white flex items-center justify-center border border-white/25 backdrop-blur-md transition-all shadow-2xl cursor-pointer group hover:border-brand-orange"
                 title="Previous Image (ArrowLeft)"
                 aria-label="Previous image"
               >
-                <svg className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-6 sm:h-6 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -954,7 +958,7 @@ export default function Projects({ items = [], onToggleCv }) {
                 key={lightboxData.index}
                 src={lightboxData.images[lightboxData.index]?.url}
                 alt={`${lightboxData.title} - Screenshot ${lightboxData.index + 1}`}
-                className="max-w-[90vw] sm:max-w-[84vw] md:max-w-[78vw] max-h-[66vh] sm:max-h-[72vh] md:max-h-[76vh] object-contain rounded-xl select-none animate-fadeIn"
+                className="max-w-[92vw] sm:max-w-[84vw] md:max-w-[78vw] max-h-[66vh] sm:max-h-[72vh] md:max-h-[76vh] object-contain rounded-xl select-none animate-fadeIn"
               />
             </div>
 
@@ -963,11 +967,11 @@ export default function Projects({ items = [], onToggleCv }) {
               <button
                 type="button"
                 onClick={handleLightboxNext}
-                className="absolute right-1 sm:right-3 md:right-4 z-30 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-black/70 hover:bg-black/90 active:scale-90 text-white flex items-center justify-center border border-white/25 backdrop-blur-md transition-all shadow-2xl cursor-pointer group hover:border-brand-orange"
+                className="absolute right-1 sm:right-3 md:right-4 z-30 w-9 h-9 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 active:scale-90 text-white flex items-center justify-center border border-white/25 backdrop-blur-md transition-all shadow-2xl cursor-pointer group hover:border-brand-orange"
                 title="Next Image (ArrowRight)"
                 aria-label="Next image"
               >
-                <svg className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-6 sm:h-6 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
