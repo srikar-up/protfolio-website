@@ -23,15 +23,15 @@ export default function AboutQuote({ data }) {
         <img 
           src={portraitImg} 
           alt="Srikar Maddela - About Me" 
-          className="absolute top-12 left-1/2 -translate-x-1/2 h-[68%] w-auto max-w-none object-contain object-top grayscale opacity-90 dark:opacity-85 transition-transform duration-700 ease-out"
+          className="absolute top-12 left-1/2 -translate-x-1/2 h-[72%] w-auto max-w-none object-contain object-top grayscale opacity-95 dark:opacity-90 transition-transform duration-700 ease-out"
           style={{
-            WebkitMaskImage: 'linear-gradient(to bottom, black 65%, rgba(0,0,0,0.45) 84%, transparent 100%)',
-            maskImage: 'linear-gradient(to bottom, black 65%, rgba(0,0,0,0.45) 84%, transparent 100%)'
+            WebkitMaskImage: 'linear-gradient(to bottom, black 70%, rgba(0,0,0,0.4) 88%, transparent 100%)',
+            maskImage: 'linear-gradient(to bottom, black 70%, rgba(0,0,0,0.4) 88%, transparent 100%)'
           }}
         />
 
-        {/* Linear Gradient: Bottom is 100% solid white where content sits, fading to translucent at top */}
-        <div className="absolute inset-0 bg-gradient-to-t from-white from-38% via-white/80 via-56% to-transparent dark:from-brand-darkCard dark:from-38% dark:via-brand-darkCard/80 dark:via-56% dark:to-transparent" />
+        {/* Linear Gradient: Decreased height so the photo is clearly visible while text remains legible */}
+        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-white from-20% via-white/85 via-50% to-transparent dark:from-brand-darkCard dark:from-20% dark:via-brand-darkCard/85 dark:via-50% dark:to-transparent" />
       </div>
 
       {/* ========================================================================= */}
